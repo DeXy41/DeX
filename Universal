@@ -1,2078 +1,1742 @@
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local CoreGui = game:GetService("CoreGui")
-local Camera = workspace.CurrentCamera
-local GuiService = game:GetService("GuiService")
-local HttpService = game:GetService("HttpService")
-local SoundService = game:GetService("SoundService")
-local Lighting = game:GetService("Lighting")
+--[[
+ .____                  ________ ___.    _____                           __                
+ |    |    __ _______   \_____  \\_ |___/ ____\_ __  ______ ____ _____ _/  |_  ___________ 
+ |    |   |  |  \__  \   /   |   \| __ \   __\  |  \/  ___// ___\\__  \\   __\/  _ \_  __ \
+ |    |___|  |  // __ \_/    |    \ \_\ \  | |  |  /\___ \\  \___ / __ \|  | (  <_> )  | \/
+ |_______ \____/(____  /\_______  /___  /__| |____//____  >\___  >____  /__|  \____/|__|   
+         \/          \/         \/    \/                \/     \/     \/                   
+          \_Welcome to LuaObfuscator.com   (Alpha 0.10.9) ~  Much Love, Ferib 
 
-local correctKey = "wyattisgay123"
-local keyVerified = false
+]]--
 
+local Players = game:GetService("Players");
+local UserInputService = game:GetService("UserInputService");
+local TweenService = game:GetService("TweenService");
+local RunService = game:GetService("RunService");
+local CoreGui = game:GetService("CoreGui");
+local Camera = workspace.CurrentCamera;
+local GuiService = game:GetService("GuiService");
+local HttpService = game:GetService("HttpService");
+local SoundService = game:GetService("SoundService");
+local Lighting = game:GetService("Lighting");
+local correctKey = "wyattisgay123";
+local keyVerified = false;
 local function createKeyPrompt()
-    local keyGui = Instance.new("ScreenGui")
-    keyGui.Name = "DeXKeyPrompt"
-    keyGui.Parent = CoreGui
-    keyGui.ResetOnSpawn = false
-    keyGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-    local mainFrame = Instance.new("Frame")  
-    mainFrame.Name = "MainFrame"  
-    mainFrame.Parent = keyGui  
-    mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)  
-    mainFrame.BorderSizePixel = 0  
-    mainFrame.Position = UDim2.new(0.5, -200, 0.5, -100)  
-    mainFrame.Size = UDim2.new(0, 400, 0, 200)  
-    mainFrame.ClipsDescendants = true  
-    
-    local mainCorner = Instance.new("UICorner")  
-    mainCorner.CornerRadius = UDim.new(0, 12)  
-    mainCorner.Parent = mainFrame  
-    
-    local gradient = Instance.new("UIGradient")  
-    gradient.Color = ColorSequence.new{  
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 30)),  
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))  
-    }  
-    gradient.Rotation = 45  
-    gradient.Parent = mainFrame  
-    
-    local title = Instance.new("TextLabel")  
-    title.Name = "Title"  
-    title.Parent = mainFrame  
-    title.BackgroundTransparency = 1  
-    title.Position = UDim2.new(0, 0, 0, 20)  
-    title.Size = UDim2.new(1, 0, 0, 40)  
-    title.Font = Enum.Font.GothamBold  
-    title.Text = "DeX Authentication"  
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)  
-    title.TextSize = 20  
-    title.TextXAlignment = Enum.TextXAlignment.Center  
-    
-    local subtitle = Instance.new("TextLabel")  
-    subtitle.Name = "Subtitle"  
-    subtitle.Parent = mainFrame  
-    subtitle.BackgroundTransparency = 1  
-    subtitle.Position = UDim2.new(0, 0, 0, 60)  
-    subtitle.Size = UDim2.new(1, 0, 0, 20)  
-    subtitle.Font = Enum.Font.Gotham  
-    subtitle.Text = "Enter your access key to continue"  
-    subtitle.TextColor3 = Color3.fromRGB(200, 200, 200)  
-    subtitle.TextSize = 14  
-    subtitle.TextXAlignment = Enum.TextXAlignment.Center  
-    
-    local inputBox = Instance.new("TextBox")  
-    inputBox.Name = "InputBox"  
-    inputBox.Parent = mainFrame  
-    inputBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)  
-    inputBox.BorderSizePixel = 0  
-    inputBox.Position = UDim2.new(0.5, -150, 0, 90)  
-    inputBox.Size = UDim2.new(0, 300, 0, 40)  
-    inputBox.Font = Enum.Font.Gotham  
-    inputBox.PlaceholderText = "Enter key..."  
-    inputBox.Text = ""  
-    inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)  
-    inputBox.TextSize = 16  
-    inputBox.ClearTextOnFocus = false  
-    
-    local inputCorner = Instance.new("UICorner")  
-    inputCorner.CornerRadius = UDim.new(0, 8)  
-    inputCorner.Parent = inputBox  
-    
-    local submitButton = Instance.new("TextButton")  
-    submitButton.Name = "SubmitButton"  
-    submitButton.Parent = mainFrame  
-    submitButton.BackgroundColor3 = Color3.fromRGB(70, 130, 255)  
-    submitButton.BorderSizePixel = 0  
-    submitButton.Position = UDim2.new(0.5, -75, 0, 140)  
-    submitButton.Size = UDim2.new(0, 150, 0, 40)  
-    submitButton.Font = Enum.Font.GothamBold  
-    submitButton.Text = "Submit"  
-    submitButton.TextColor3 = Color3.fromRGB(255, 255, 255)  
-    submitButton.TextSize = 16  
-    
-    local buttonCorner = Instance.new("UICorner")  
-    buttonCorner.CornerRadius = UDim.new(0, 8)  
-    buttonCorner.Parent = submitButton  
-    
-    local errorMsg = Instance.new("TextLabel")  
-    errorMsg.Name = "ErrorMessage"  
-    errorMsg.Parent = mainFrame  
-    errorMsg.BackgroundTransparency = 1  
-    errorMsg.Position = UDim2.new(0, 0, 0, 185)  
-    errorMsg.Size = UDim2.new(1, 0, 0, 20)  
-    errorMsg.Font = Enum.Font.Gotham  
-    errorMsg.Text = ""  
-    errorMsg.TextColor3 = Color3.fromRGB(255, 100, 100)  
-    errorMsg.TextSize = 12  
-    errorMsg.TextXAlignment = Enum.TextXAlignment.Center  
-    errorMsg.Visible = false  
-    
-    local function submitKey()  
-        if inputBox.Text == correctKey then  
-            keyVerified = true  
-            keyGui:Destroy()  
-        else  
-            errorMsg.Text = "Invalid key! Please try again."  
-            errorMsg.Visible = true  
-            inputBox.Text = ""  
-            inputBox:CaptureFocus()  
-        end  
-    end  
-    
-    submitButton.MouseButton1Click:Connect(submitKey)  
-    inputBox.FocusLost:Connect(function(enterPressed)  
-        if enterPressed then  
-            submitKey()  
-        end  
-    end)  
-    
-    inputBox:CaptureFocus()  
+	local keyGui = Instance.new("ScreenGui");
+	keyGui.Name = "DeXKeyPrompt";
+	keyGui.Parent = CoreGui;
+	keyGui.ResetOnSpawn = false;
+	keyGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+	local mainFrame = Instance.new("Frame");
+	mainFrame.Name = "MainFrame";
+	mainFrame.Parent = keyGui;
+	mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25);
+	mainFrame.BorderSizePixel = 0;
+	mainFrame.Position = UDim2.new(0.5, -200, 0.5, -100);
+	mainFrame.Size = UDim2.new(0, 400, 0, 200);
+	mainFrame.ClipsDescendants = true;
+	local mainCorner = Instance.new("UICorner");
+	mainCorner.CornerRadius = UDim.new(0, 12);
+	mainCorner.Parent = mainFrame;
+	local gradient = Instance.new("UIGradient");
+	gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 30)),ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))});
+	gradient.Rotation = 45;
+	gradient.Parent = mainFrame;
+	local title = Instance.new("TextLabel");
+	title.Name = "Title";
+	title.Parent = mainFrame;
+	title.BackgroundTransparency = 1;
+	title.Position = UDim2.new(0, 0, 0, 20);
+	title.Size = UDim2.new(1, 0, 0, 40);
+	title.Font = Enum.Font.GothamBold;
+	title.Text = "DeX Authentication";
+	title.TextColor3 = Color3.fromRGB(255, 255, 255);
+	title.TextSize = 20;
+	title.TextXAlignment = Enum.TextXAlignment.Center;
+	local subtitle = Instance.new("TextLabel");
+	subtitle.Name = "Subtitle";
+	subtitle.Parent = mainFrame;
+	subtitle.BackgroundTransparency = 1;
+	subtitle.Position = UDim2.new(0, 0, 0, 60);
+	subtitle.Size = UDim2.new(1, 0, 0, 20);
+	subtitle.Font = Enum.Font.Gotham;
+	subtitle.Text = "Enter your access key to continue";
+	subtitle.TextColor3 = Color3.fromRGB(200, 200, 200);
+	subtitle.TextSize = 14;
+	subtitle.TextXAlignment = Enum.TextXAlignment.Center;
+	local inputBox = Instance.new("TextBox");
+	inputBox.Name = "InputBox";
+	inputBox.Parent = mainFrame;
+	inputBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40);
+	inputBox.BorderSizePixel = 0;
+	inputBox.Position = UDim2.new(0.5, -150, 0, 90);
+	inputBox.Size = UDim2.new(0, 300, 0, 40);
+	inputBox.Font = Enum.Font.Gotham;
+	inputBox.PlaceholderText = "Enter key...";
+	inputBox.Text = "";
+	inputBox.TextColor3 = Color3.fromRGB(255, 255, 255);
+	inputBox.TextSize = 16;
+	inputBox.ClearTextOnFocus = false;
+	local inputCorner = Instance.new("UICorner");
+	inputCorner.CornerRadius = UDim.new(0, 8);
+	inputCorner.Parent = inputBox;
+	local submitButton = Instance.new("TextButton");
+	submitButton.Name = "SubmitButton";
+	submitButton.Parent = mainFrame;
+	submitButton.BackgroundColor3 = Color3.fromRGB(70, 130, 255);
+	submitButton.BorderSizePixel = 0;
+	submitButton.Position = UDim2.new(0.5, -75, 0, 140);
+	submitButton.Size = UDim2.new(0, 150, 0, 40);
+	submitButton.Font = Enum.Font.GothamBold;
+	submitButton.Text = "Submit";
+	submitButton.TextColor3 = Color3.fromRGB(255, 255, 255);
+	submitButton.TextSize = 16;
+	local buttonCorner = Instance.new("UICorner");
+	buttonCorner.CornerRadius = UDim.new(0, 8);
+	buttonCorner.Parent = submitButton;
+	local errorMsg = Instance.new("TextLabel");
+	errorMsg.Name = "ErrorMessage";
+	errorMsg.Parent = mainFrame;
+	errorMsg.BackgroundTransparency = 1;
+	errorMsg.Position = UDim2.new(0, 0, 0, 185);
+	errorMsg.Size = UDim2.new(1, 0, 0, 20);
+	errorMsg.Font = Enum.Font.Gotham;
+	errorMsg.Text = "";
+	errorMsg.TextColor3 = Color3.fromRGB(255, 100, 100);
+	errorMsg.TextSize = 12;
+	errorMsg.TextXAlignment = Enum.TextXAlignment.Center;
+	errorMsg.Visible = false;
+	local function submitKey()
+		if (inputBox.Text == correctKey) then
+			keyVerified = true;
+			keyGui:Destroy();
+		else
+			errorMsg.Text = "Invalid key! Please try again.";
+			errorMsg.Visible = true;
+			inputBox.Text = "";
+			inputBox:CaptureFocus();
+		end
+	end
+	submitButton.MouseButton1Click:Connect(submitKey);
+	inputBox.FocusLost:Connect(function(enterPressed)
+		if enterPressed then
+			submitKey();
+		end
+	end);
+	inputBox:CaptureFocus();
 end
-
-createKeyPrompt()
-
+createKeyPrompt();
 while not keyVerified do
-    RunService.Heartbeat:Wait()
+	RunService.Heartbeat:Wait();
 end
-
 if not game:IsLoaded() then
-    game.Loaded:Wait()
+	game.Loaded:Wait();
 end
-
-if not syn or not protectgui then
-    getgenv().protectgui = function() end
+if (not syn or not protectgui) then
+	getgenv().protectgui = function()
+	end;
 end
-
 if getgenv().bypassadonis then
-    task.spawn(function()
-        local getinfo = debug and (debug.getinfo or getinfo) or nil
-        local flagged = false
-        local hooks = {}
-        local x, y
-        setthreadidentity(2)
-        for _, v in pairs(getgc(true)) do
-            if typeof(v) == "table" then
-                local detected = rawget(v, "Detected")
-                local kill = rawget(v, "Kill")
-                if typeof(detected) == "function" and not x then
-                    x = detected
-                    if hookfunction then
-                        local original = hookfunction(x, function(...)
-                            local c, f, n = ...
-                            if c then
-                                if flagged then
-                                    warn("Adonis AntiCheat flagged", c, f)
-                                end
-                            end
-                            return true
-                        end)
-                    end
-                    table.insert(hooks, x)
-                end
-                if typeof(kill) == "function" and not y then
-                    y = kill
-                    if hookfunction then
-                        local original = hookfunction(y, function(...)
-                            if flagged then
-                                warn("Adonis AntiCheat tried to kill fallback")
-                            end
-                        end)
-                    end
-                    table.insert(hooks, y)
-                end
-            end
-        end
-        setthreadidentity(7)
-    end)
+	task.spawn(function()
+		local getinfo = (debug and (debug.getinfo or getinfo)) or nil;
+		local flagged = false;
+		local hooks = {};
+		local x, y;
+		setthreadidentity(2);
+		for _, v in pairs(getgc(true)) do
+			if (typeof(v) == "table") then
+				local detected = rawget(v, "Detected");
+				local kill = rawget(v, "Kill");
+				if ((typeof(detected) == "function") and not x) then
+					x = detected;
+					if hookfunction then
+						local original = hookfunction(x, function(...)
+							local c, f, n = ...;
+							if c then
+								if flagged then
+									warn("Adonis AntiCheat flagged", c, f);
+								end
+							end
+							return true;
+						end);
+					end
+					table.insert(hooks, x);
+				end
+				if ((typeof(kill) == "function") and not y) then
+					y = kill;
+					if hookfunction then
+						local original = hookfunction(y, function(...)
+							if flagged then
+								warn("Adonis AntiCheat tried to kill fallback");
+							end
+						end);
+					end
+					table.insert(hooks, y);
+				end
+			end
+		end
+		setthreadidentity(7);
+	end);
 end
-
 if not getgenv().DeXState then
-    getgenv().DeXState = {
-        isLockedOn = false,
-        targetPlayer = nil,
-        lockEnabled = false,
-        aimLockEnabled = false,
-        smoothingFactor = 0.1,
-        predictionFactor = 0.0,
-        bodyPartSelected = "Head",
-        lockedTime = 12,
-        antiLockEnabled = false,
-        resolverIntensity = 1.0,
-        resolverMethod = "Recalculate",
-        reverseResolveIntensity = 5,
-        Desync = false,
-        DesyncEnabled = false,
-        fovEnabled = false,
-        fovValue = 130,
-        SelfChamsEnabled = false,
-        OtherChamsEnabled = false,
-        RainbowChamsEnabled = false,
-        SelfChamsColor = Color3.fromRGB(255, 255, 255),
-        OtherChamsColor = Color3.fromRGB(255, 0, 0),
-        nebulaEnabled = false,
-        espEnabled = false,
-        espNameTag = false,
-        espBox = false,
-        espTracer = false,
-        espHeadDot = false,
-        espHealthBar = false,
-        espTeamCheck = false,
-        isSpeedActive = false,
-        isFlyActive = false,
-        isNoClipActive = false,
-        flySpeed = 50,
-        strafeEnabled = false,
-        strafeSpeed = 50,
-        strafeRadius = 5,
-        strafeMode = "Horizontal",
-        silentAimEnabled = false,
-        teamCheck = false,
-        targetPart = "HumanoidRootPart",
-        hitChance = 100,
-        bulletTeleport = false,
-        silentAimMethod = "Raycast",
-        hitSoundEnabled = false,
-        hitSoundId = "rbxassetid://6565370984",
-        aimLockKeybind = Enum.KeyCode.Q,
-        menuKeybind = Enum.KeyCode.End,
-        flyKeybind = Enum.KeyCode.F,
-        speedKeybind = Enum.KeyCode.X,
-        noclipKeybind = Enum.KeyCode.N,
-        strafeKeybind = Enum.KeyCode.C,
-        masterToggle = true,
-    }
+	getgenv().DeXState = {isLockedOn=false,targetPlayer=nil,lockEnabled=false,aimLockEnabled=false,smoothingFactor=0.1,predictionFactor=0,bodyPartSelected="Head",lockedTime=12,antiLockEnabled=false,resolverIntensity=1,resolverMethod="Recalculate",reverseResolveIntensity=5,Desync=false,DesyncEnabled=false,fovEnabled=false,fovValue=130,SelfChamsEnabled=false,OtherChamsEnabled=false,RainbowChamsEnabled=false,SelfChamsColor=Color3.fromRGB(255, 255, 255),OtherChamsColor=Color3.fromRGB(255, 0, 0),nebulaEnabled=false,espEnabled=false,espNameTag=false,espBox=false,espTracer=false,espHeadDot=false,espHealthBar=false,espTeamCheck=false,isSpeedActive=false,isFlyActive=false,isNoClipActive=false,flySpeed=50,strafeEnabled=false,strafeSpeed=50,strafeRadius=5,strafeMode="Horizontal",silentAimEnabled=false,teamCheck=false,targetPart="HumanoidRootPart",hitChance=100,bulletTeleport=false,silentAimMethod="Raycast",hitSoundEnabled=false,hitSoundId="rbxassetid://6565370984",aimLockKeybind=Enum.KeyCode.Q,menuKeybind=Enum.KeyCode.End,flyKeybind=Enum.KeyCode.F,speedKeybind=Enum.KeyCode.X,noclipKeybind=Enum.KeyCode.N,strafeKeybind=Enum.KeyCode.C,masterToggle=true};
 end
-
-local DeXState = getgenv().DeXState
-
-local SilentAimSettings = {
-    Enabled = false,
-    ClassName = "DeX github.comFakeAngles",
-    TeamCheck = false,
-    TargetPart = "HumanoidRootPart",
-    SilentAimMethod = "Raycast",
-    FOVRadius = 130,
-    FOVVisible = false,
-    ShowSilentAimTarget = false,
-    HitChance = 100,
-    BulletTP = false
-}
-getgenv().SilentAimSettings = SilentAimSettings
-
-local fovcircle = Drawing.new("Circle")
-fovcircle.Thickness = 2
-fovcircle.NumSides = 100
-fovcircle.Radius = 130
-fovcircle.Filled = false
-fovcircle.Visible = false
-fovcircle.ZIndex = 999
-fovcircle.Transparency = 1
-fovcircle.Color = Color3.fromRGB(70, 130, 255)
-
-local sounds = {
-    RIFK7 = "rbxassetid://9102080552",
-    Bubble = "rbxassetid://9102092728",
-    Minecraft = "rbxassetid://5869422451",
-    Cod = "rbxassetid://160432334",
-    Bameware = "rbxassetid://6565367558",
-    Neverlose = "rbxassetid://6565370984",
-    Gamesense = "rbxassetid://4817809188",
-    Rust = "rbxassetid://6565371338",
-}
-
-local hitSound = Instance.new("Sound")
-hitSound.Volume = 0.5
-hitSound.SoundId = DeXState.hitSoundId
-hitSound.Parent = SoundService
-
-local soundPool = {}
-local soundIndex = 1
-
+local DeXState = getgenv().DeXState;
+local SilentAimSettings = {Enabled=false,ClassName="DeX github.comFakeAngles",TeamCheck=false,TargetPart="HumanoidRootPart",SilentAimMethod="Raycast",FOVRadius=130,FOVVisible=false,ShowSilentAimTarget=false,HitChance=100,BulletTP=false};
+getgenv().SilentAimSettings = SilentAimSettings;
+local fovcircle = Drawing.new("Circle");
+fovcircle.Thickness = 2;
+fovcircle.NumSides = 100;
+fovcircle.Radius = 130;
+fovcircle.Filled = false;
+fovcircle.Visible = false;
+fovcircle.ZIndex = 999;
+fovcircle.Transparency = 1;
+fovcircle.Color = Color3.fromRGB(70, 130, 255);
+local sounds = {RIFK7="rbxassetid://9102080552",Bubble="rbxassetid://9102092728",Minecraft="rbxassetid://5869422451",Cod="rbxassetid://160432334",Bameware="rbxassetid://6565367558",Neverlose="rbxassetid://6565370984",Gamesense="rbxassetid://4817809188",Rust="rbxassetid://6565371338"};
+local hitSound = Instance.new("Sound");
+hitSound.Volume = 0.5;
+hitSound.SoundId = DeXState.hitSoundId;
+hitSound.Parent = SoundService;
+local soundPool = {};
+local soundIndex = 1;
 local function getNextSound()
-    if soundIndex > #soundPool then
-        local s = hitSound:Clone()
-        s.Parent = workspace
-        s.Looped = false
-        table.insert(soundPool, s)
-    end
-    local s = soundPool[soundIndex]
-    soundIndex = soundIndex + 1
-    if soundIndex > #soundPool then soundIndex = 1 end
-    return s
+	if (soundIndex > #soundPool) then
+		local s = hitSound:Clone();
+		s.Parent = workspace;
+		s.Looped = false;
+		table.insert(soundPool, s);
+	end
+	local s = soundPool[soundIndex];
+	soundIndex = soundIndex + 1;
+	if (soundIndex > #soundPool) then
+		soundIndex = 1;
+	end
+	return s;
 end
-
 local function playHitSound()
-    if DeXState.hitSoundEnabled then
-        local s = getNextSound()
-        s:Stop()
-        s:Play()
-    end
+	if DeXState.hitSoundEnabled then
+		local s = getNextSound();
+		s:Stop();
+		s:Play();
+	end
 end
-
-local ESP = nil
-local espObjects = {}
-local chamsObjects = {}
-
--- Improved ESP system
+local ESP = nil;
+local espObjects = {};
+local chamsObjects = {};
 local function createESP(player)
-    if player == Players.LocalPlayer then return end
-    if not player.Character then return end
-    
-    local char = player.Character
-    if not char:FindFirstChild("HumanoidRootPart") then return end
-    
-    local espFolder = Instance.new("Folder")
-    espFolder.Name = "ESP_" .. player.Name
-    espFolder.Parent = CoreGui
-    
-    -- Box
-    local box = Drawing.new("Square")
-    box.Visible = false
-    box.Color = Color3.fromRGB(255, 255, 255)
-    box.Thickness = 2
-    box.Filled = false
-    box.Transparency = 1
-    
-    -- Name
-    local name = Drawing.new("Text")
-    name.Visible = false
-    name.Color = Color3.fromRGB(255, 255, 255)
-    name.Size = 14
-    name.Center = true
-    name.Outline = true
-    name.Font = 2
-    
-    -- Health bar
-    local healthBarOutline = Drawing.new("Square")
-    healthBarOutline.Visible = false
-    healthBarOutline.Color = Color3.fromRGB(0, 0, 0)
-    healthBarOutline.Thickness = 1
-    healthBarOutline.Filled = true
-    healthBarOutline.Transparency = 1
-    
-    local healthBar = Drawing.new("Square")
-    healthBar.Visible = false
-    healthBar.Color = Color3.fromRGB(0, 255, 0)
-    healthBar.Thickness = 1
-    healthBar.Filled = true
-    healthBar.Transparency = 1
-    
-    -- Tracer
-    local tracer = Drawing.new("Line")
-    tracer.Visible = false
-    tracer.Color = Color3.fromRGB(255, 255, 255)
-    tracer.Thickness = 1
-    tracer.Transparency = 1
-    
-    espObjects[player] = {
-        box = box,
-        name = name,
-        healthBarOutline = healthBarOutline,
-        healthBar = healthBar,
-        tracer = tracer,
-        player = player
-    }
+	if (player == Players.LocalPlayer) then
+		return;
+	end
+	if not player.Character then
+		return;
+	end
+	local char = player.Character;
+	if not char:FindFirstChild("HumanoidRootPart") then
+		return;
+	end
+	local espFolder = Instance.new("Folder");
+	espFolder.Name = "ESP_" .. player.Name;
+	espFolder.Parent = CoreGui;
+	local box = Drawing.new("Square");
+	box.Visible = false;
+	box.Color = Color3.fromRGB(255, 255, 255);
+	box.Thickness = 2;
+	box.Filled = false;
+	box.Transparency = 1;
+	local name = Drawing.new("Text");
+	name.Visible = false;
+	name.Color = Color3.fromRGB(255, 255, 255);
+	name.Size = 14;
+	name.Center = true;
+	name.Outline = true;
+	name.Font = 2;
+	local healthBarOutline = Drawing.new("Square");
+	healthBarOutline.Visible = false;
+	healthBarOutline.Color = Color3.fromRGB(0, 0, 0);
+	healthBarOutline.Thickness = 1;
+	healthBarOutline.Filled = true;
+	healthBarOutline.Transparency = 1;
+	local healthBar = Drawing.new("Square");
+	healthBar.Visible = false;
+	healthBar.Color = Color3.fromRGB(0, 255, 0);
+	healthBar.Thickness = 1;
+	healthBar.Filled = true;
+	healthBar.Transparency = 1;
+	local tracer = Drawing.new("Line");
+	tracer.Visible = false;
+	tracer.Color = Color3.fromRGB(255, 255, 255);
+	tracer.Thickness = 1;
+	tracer.Transparency = 1;
+	espObjects[player] = {box=box,name=name,healthBarOutline=healthBarOutline,healthBar=healthBar,tracer=tracer,player=player};
 end
-
 local function updateESP()
-    for player, esp in pairs(espObjects) do
-        if not player or not player.Parent or not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
-            if esp.box then esp.box.Visible = false end
-            if esp.name then esp.name.Visible = false end
-            if esp.healthBarOutline then esp.healthBarOutline.Visible = false end
-            if esp.healthBar then esp.healthBar.Visible = false end
-            if esp.tracer then esp.tracer.Visible = false end
-            continue
-        end
-        
-        local char = player.Character
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        local humanoid = char:FindFirstChildOfClass("Humanoid")
-        
-        if not hrp or not humanoid then continue end
-        
-        local shouldShow = DeXState.espEnabled and (not DeXState.espTeamCheck or player.Team ~= Players.LocalPlayer.Team)
-        
-        if not shouldShow then
-            esp.box.Visible = false
-            esp.name.Visible = false
-            esp.healthBarOutline.Visible = false
-            esp.healthBar.Visible = false
-            esp.tracer.Visible = false
-            continue
-        end
-        
-        -- Get position on screen
-        local position, onScreen = Camera:WorldToViewportPoint(hrp.Position)
-        
-        if not onScreen then
-            esp.box.Visible = false
-            esp.name.Visible = false
-            esp.healthBarOutline.Visible = false
-            esp.healthBar.Visible = false
-            esp.tracer.Visible = false
-            continue
-        end
-        
-        -- Calculate box size based on character size
-        local size = Vector2.new(2000 / position.Z, 3000 / position.Z)
-        local offset = Vector2.new(size.X / 2, size.Y / 2)
-        
-        -- Box
-        if DeXState.espBox then
-            esp.box.Visible = true
-            esp.box.Size = size
-            esp.box.Position = Vector2.new(position.X - offset.X, position.Y - offset.Y)
-        else
-            esp.box.Visible = false
-        end
-        
-        -- Name
-        if DeXState.espNameTag then
-            esp.name.Visible = true
-            esp.name.Text = player.Name
-            esp.name.Position = Vector2.new(position.X, position.Y - offset.Y - 20)
-        else
-            esp.name.Visible = false
-        end
-        
-        -- Health bar
-        if DeXState.espHealthBar then
-            local healthPercentage = humanoid.Health / humanoid.MaxHealth
-            local barHeight = size.Y * healthPercentage
-            local barWidth = 4
-            
-            esp.healthBarOutline.Visible = true
-            esp.healthBarOutline.Size = Vector2.new(barWidth + 2, size.Y + 2)
-            esp.healthBarOutline.Position = Vector2.new(position.X - offset.X - barWidth - 5, position.Y - offset.Y - 1)
-            
-            esp.healthBar.Visible = true
-            esp.healthBar.Size = Vector2.new(barWidth, barHeight)
-            esp.healthBar.Position = Vector2.new(position.X - offset.X - barWidth - 4, position.Y - offset.Y + (size.Y - barHeight))
-            
-            -- Change color based on health
-            if healthPercentage > 0.5 then
-                esp.healthBar.Color = Color3.fromRGB(0, 255, 0)
-            elseif healthPercentage > 0.25 then
-                esp.healthBar.Color = Color3.fromRGB(255, 255, 0)
-            else
-                esp.healthBar.Color = Color3.fromRGB(255, 0, 0)
-            end
-        else
-            esp.healthBarOutline.Visible = false
-            esp.healthBar.Visible = false
-        end
-        
-        -- Tracer
-        if DeXState.espTracer then
-            esp.tracer.Visible = true
-            esp.tracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
-            esp.tracer.To = Vector2.new(position.X, position.Y + offset.Y)
-        else
-            esp.tracer.Visible = false
-        end
-    end
+	for player, esp in pairs(espObjects) do
+		if (not player or not player.Parent or not player.Character or not player.Character:FindFirstChild("HumanoidRootPart")) then
+			if esp.box then
+				esp.box.Visible = false;
+			end
+			if esp.name then
+				esp.name.Visible = false;
+			end
+			if esp.healthBarOutline then
+				esp.healthBarOutline.Visible = false;
+			end
+			if esp.healthBar then
+				esp.healthBar.Visible = false;
+			end
+			if esp.tracer then
+				esp.tracer.Visible = false;
+			end
+			continue;
+		end
+		local char = player.Character;
+		local hrp = char:FindFirstChild("HumanoidRootPart");
+		local humanoid = char:FindFirstChildOfClass("Humanoid");
+		if (not hrp or not humanoid) then
+			continue;
+		end
+		local shouldShow = DeXState.espEnabled and (not DeXState.espTeamCheck or (player.Team ~= Players.LocalPlayer.Team));
+		if not shouldShow then
+			esp.box.Visible = false;
+			esp.name.Visible = false;
+			esp.healthBarOutline.Visible = false;
+			esp.healthBar.Visible = false;
+			esp.tracer.Visible = false;
+			continue;
+		end
+		local position, onScreen = Camera:WorldToViewportPoint(hrp.Position);
+		if not onScreen then
+			esp.box.Visible = false;
+			esp.name.Visible = false;
+			esp.healthBarOutline.Visible = false;
+			esp.healthBar.Visible = false;
+			esp.tracer.Visible = false;
+			continue;
+		end
+		local size = Vector2.new(2000 / position.Z, 3000 / position.Z);
+		local offset = Vector2.new(size.X / 2, size.Y / 2);
+		if DeXState.espBox then
+			esp.box.Visible = true;
+			esp.box.Size = size;
+			esp.box.Position = Vector2.new(position.X - offset.X, position.Y - offset.Y);
+		else
+			esp.box.Visible = false;
+		end
+		if DeXState.espNameTag then
+			esp.name.Visible = true;
+			esp.name.Text = player.Name;
+			esp.name.Position = Vector2.new(position.X, (position.Y - offset.Y) - 20);
+		else
+			esp.name.Visible = false;
+		end
+		if DeXState.espHealthBar then
+			local healthPercentage = humanoid.Health / humanoid.MaxHealth;
+			local barHeight = size.Y * healthPercentage;
+			local barWidth = 4;
+			esp.healthBarOutline.Visible = true;
+			esp.healthBarOutline.Size = Vector2.new(barWidth + 2, size.Y + 2);
+			esp.healthBarOutline.Position = Vector2.new(((position.X - offset.X) - barWidth) - 5, (position.Y - offset.Y) - 1);
+			esp.healthBar.Visible = true;
+			esp.healthBar.Size = Vector2.new(barWidth, barHeight);
+			esp.healthBar.Position = Vector2.new(((position.X - offset.X) - barWidth) - 4, (position.Y - offset.Y) + (size.Y - barHeight));
+			if (healthPercentage > 0.5) then
+				esp.healthBar.Color = Color3.fromRGB(0, 255, 0);
+			elseif (healthPercentage > 0.25) then
+				esp.healthBar.Color = Color3.fromRGB(255, 255, 0);
+			else
+				esp.healthBar.Color = Color3.fromRGB(255, 0, 0);
+			end
+		else
+			esp.healthBarOutline.Visible = false;
+			esp.healthBar.Visible = false;
+		end
+		if DeXState.espTracer then
+			esp.tracer.Visible = true;
+			esp.tracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y);
+			esp.tracer.To = Vector2.new(position.X, position.Y + offset.Y);
+		else
+			esp.tracer.Visible = false;
+		end
+	end
 end
-
 local function clearESP()
-    for player, esp in pairs(espObjects) do
-        if esp.box then esp.box:Remove() end
-        if esp.name then esp.name:Remove() end
-        if esp.healthBarOutline then esp.healthBarOutline:Remove() end
-        if esp.healthBar then esp.healthBar:Remove() end
-        if esp.tracer then esp.tracer:Remove() end
-    end
-    espObjects = {}
+	for player, esp in pairs(espObjects) do
+		if esp.box then
+			esp.box:Remove();
+		end
+		if esp.name then
+			esp.name:Remove();
+		end
+		if esp.healthBarOutline then
+			esp.healthBarOutline:Remove();
+		end
+		if esp.healthBar then
+			esp.healthBar:Remove();
+		end
+		if esp.tracer then
+			esp.tracer:Remove();
+		end
+	end
+	espObjects = {};
 end
-
--- Improved chams system
 local function applyChams(char, isSelf)
-    if not char then return end
-    
-    local chamsFolder = Instance.new("Folder")
-    chamsFolder.Name = "Chams_" .. char.Name
-    chamsFolder.Parent = CoreGui
-    
-    local parts = {}
-    
-    for _, part in ipairs(char:GetDescendants()) do
-        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-            local highlight = Instance.new("Highlight")
-            highlight.Parent = chamsFolder
-            highlight.Adornee = part
-            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-            highlight.FillTransparency = 0.5
-            highlight.OutlineTransparency = 0
-            
-            if isSelf then
-                highlight.FillColor = DeXState.SelfChamsColor
-                highlight.OutlineColor = DeXState.SelfChamsColor
-            else
-                highlight.FillColor = DeXState.OtherChamsColor
-                highlight.OutlineColor = DeXState.OtherChamsColor
-            end
-            
-            parts[part] = highlight
-        end
-    end
-    
-    chamsObjects[char] = {
-        folder = chamsFolder,
-        parts = parts
-    }
+	if not char then
+		return;
+	end
+	local chamsFolder = Instance.new("Folder");
+	chamsFolder.Name = "Chams_" .. char.Name;
+	chamsFolder.Parent = CoreGui;
+	local parts = {};
+	for _, part in ipairs(char:GetDescendants()) do
+		if (part:IsA("BasePart") and (part.Name ~= "HumanoidRootPart")) then
+			local highlight = Instance.new("Highlight");
+			highlight.Parent = chamsFolder;
+			highlight.Adornee = part;
+			highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop;
+			highlight.FillTransparency = 0.5;
+			highlight.OutlineTransparency = 0;
+			if isSelf then
+				highlight.FillColor = DeXState.SelfChamsColor;
+				highlight.OutlineColor = DeXState.SelfChamsColor;
+			else
+				highlight.FillColor = DeXState.OtherChamsColor;
+				highlight.OutlineColor = DeXState.OtherChamsColor;
+			end
+			parts[part] = highlight;
+		end
+	end
+	chamsObjects[char] = {folder=chamsFolder,parts=parts};
 end
-
 local function removeChams(char)
-    if chamsObjects[char] then
-        chamsObjects[char].folder:Destroy()
-        chamsObjects[char] = nil
-    end
+	if chamsObjects[char] then
+		chamsObjects[char].folder:Destroy();
+		chamsObjects[char] = nil;
+	end
 end
-
 local function updateChams()
-    if DeXState.RainbowChamsEnabled then
-        local hue = (tick() * 100) % 360
-        local rainbowColor = Color3.fromHSV(hue/360, 1, 1)
-        
-        for char, chamsData in pairs(chamsObjects) do
-            for part, highlight in pairs(chamsData.parts) do
-                if part and part.Parent then
-                    highlight.FillColor = rainbowColor
-                    highlight.OutlineColor = rainbowColor
-                end
-            end
-        end
-    else
-        for char, chamsData in pairs(chamsObjects) do
-            for part, highlight in pairs(chamsData.parts) do
-                if part and part.Parent then
-                    if char == Players.LocalPlayer.Character then
-                        highlight.FillColor = DeXState.SelfChamsColor
-                        highlight.OutlineColor = DeXState.SelfChamsColor
-                    else
-                        highlight.FillColor = DeXState.OtherChamsColor
-                        highlight.OutlineColor = DeXState.OtherChamsColor
-                    end
-                end
-            end
-        end
-    end
+	if DeXState.RainbowChamsEnabled then
+		local hue = (tick() * 100) % 360;
+		local rainbowColor = Color3.fromHSV(hue / 360, 1, 1);
+		for char, chamsData in pairs(chamsObjects) do
+			for part, highlight in pairs(chamsData.parts) do
+				if (part and part.Parent) then
+					highlight.FillColor = rainbowColor;
+					highlight.OutlineColor = rainbowColor;
+				end
+			end
+		end
+	else
+		for char, chamsData in pairs(chamsObjects) do
+			for part, highlight in pairs(chamsData.parts) do
+				if (part and part.Parent) then
+					if (char == Players.LocalPlayer.Character) then
+						highlight.FillColor = DeXState.SelfChamsColor;
+						highlight.OutlineColor = DeXState.SelfChamsColor;
+					else
+						highlight.FillColor = DeXState.OtherChamsColor;
+						highlight.OutlineColor = DeXState.OtherChamsColor;
+					end
+				end
+			end
+		end
+	end
 end
-
 local function clearAllChams()
-    for char, chamsData in pairs(chamsObjects) do
-        chamsData.folder:Destroy()
-    end
-    chamsObjects = {}
+	for char, chamsData in pairs(chamsObjects) do
+		chamsData.folder:Destroy();
+	end
+	chamsObjects = {};
 end
-
--- Improved walkspeed method
-local Players = game:GetService("Players")
-
-local walkSpeedConn -- store the connection
-
+local Players = game:GetService("Players");
+local walkSpeedConn;
 local function setWalkSpeed(speed)
-    local char = Players.LocalPlayer.Character
-    if not char then return end
-
-    local humanoid = char:FindFirstChildOfClass("Humanoid")
-    if not humanoid then return end
-
-    if not getgenv().originalWalkSpeed then
-        getgenv().originalWalkSpeed = humanoid.WalkSpeed
-    end
-
-    -- enforce while active
-    if DeXState.isSpeedActive then
-        humanoid.WalkSpeed = speed
-
-        -- clean up old connection before making a new one
-        if walkSpeedConn then
-            walkSpeedConn:Disconnect()
-            walkSpeedConn = nil
-        end
-
-        walkSpeedConn = humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-            if DeXState.isSpeedActive and humanoid.WalkSpeed ~= speed then
-                humanoid.WalkSpeed = speed
-            end
-        end)
-    else
-        humanoid.WalkSpeed = getgenv().originalWalkSpeed or 16
-
-        -- disconnect if not active anymore
-        if walkSpeedConn then
-            walkSpeedConn:Disconnect()
-            walkSpeedConn = nil
-        end
-    end
+	local char = Players.LocalPlayer.Character;
+	if not char then
+		return;
+	end
+	local humanoid = char:FindFirstChildOfClass("Humanoid");
+	if not humanoid then
+		return;
+	end
+	if not getgenv().originalWalkSpeed then
+		getgenv().originalWalkSpeed = humanoid.WalkSpeed;
+	end
+	if DeXState.isSpeedActive then
+		humanoid.WalkSpeed = speed;
+		if walkSpeedConn then
+			walkSpeedConn:Disconnect();
+			walkSpeedConn = nil;
+		end
+		walkSpeedConn = humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+			if (DeXState.isSpeedActive and (humanoid.WalkSpeed ~= speed)) then
+				humanoid.WalkSpeed = speed;
+			end
+		end);
+	else
+		humanoid.WalkSpeed = getgenv().originalWalkSpeed or 16;
+		if walkSpeedConn then
+			walkSpeedConn:Disconnect();
+			walkSpeedConn = nil;
+		end
+	end
 end
-
--- Improved fly system
-local flyBodyVelocity = nil
-local flyBodyGyro = nil
-local connections = {}
-local keybindConnections = {}
-
-local keysPressed = {}
-
+local flyBodyVelocity = nil;
+local flyBodyGyro = nil;
+local connections = {};
+local keybindConnections = {};
+local keysPressed = {};
 local function getBodyPart(character, partName)
-    return character:FindFirstChild(partName) or character:FindFirstChild("Head")
+	return character:FindFirstChild(partName) or character:FindFirstChild("Head");
 end
-
 local function getNearestPlayerToMouse()
-    if not DeXState.aimLockEnabled or not DeXState.masterToggle then return nil end
-    local nearestPlayer = nil
-    local shortestDistance = math.huge
-    local mousePosition = UserInputService:GetMouseLocation()
-
-    for _, player in pairs(Players:GetPlayers()) do  
-        if player ~= Players.LocalPlayer and player.Character and player.Character:FindFirstChild(DeXState.bodyPartSelected) then  
-            if DeXState.teamCheck and player.Team == Players.LocalPlayer.Team then continue end  
-              
-            local part = player.Character[DeXState.bodyPartSelected]  
-            local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)  
-            if onScreen then  
-                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePosition).Magnitude  
-                if distance < shortestDistance then  
-                    nearestPlayer = player  
-                    shortestDistance = distance  
-                end  
-            end  
-        end  
-    end  
-    return nearestPlayer  
+	if (not DeXState.aimLockEnabled or not DeXState.masterToggle) then
+		return nil;
+	end
+	local nearestPlayer = nil;
+	local shortestDistance = math.huge;
+	local mousePosition = UserInputService:GetMouseLocation();
+	for _, player in pairs(Players:GetPlayers()) do
+		if ((player ~= Players.LocalPlayer) and player.Character and player.Character:FindFirstChild(DeXState.bodyPartSelected)) then
+			if (DeXState.teamCheck and (player.Team == Players.LocalPlayer.Team)) then
+				continue;
+			end
+			local part = player.Character[DeXState.bodyPartSelected];
+			local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position);
+			if onScreen then
+				local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePosition).Magnitude;
+				if (distance < shortestDistance) then
+					nearestPlayer = player;
+					shortestDistance = distance;
+				end
+			end
+		end
+	end
+	return nearestPlayer;
 end
-
 local function toggleLockOnPlayer()
-    if not DeXState.lockEnabled or not DeXState.aimLockEnabled or not DeXState.masterToggle then return end
-
-    if DeXState.isLockedOn then  
-        DeXState.isLockedOn = false  
-        DeXState.targetPlayer = nil  
-    else  
-        DeXState.targetPlayer = getNearestPlayerToMouse()  
-        if DeXState.targetPlayer and DeXState.targetPlayer.Character then  
-            local part = getBodyPart(DeXState.targetPlayer.Character, DeXState.bodyPartSelected)  
-            if part then  
-                DeXState.isLockedOn = true  
-            end  
-        end  
-    end  
+	if (not DeXState.lockEnabled or not DeXState.aimLockEnabled or not DeXState.masterToggle) then
+		return;
+	end
+	if DeXState.isLockedOn then
+		DeXState.isLockedOn = false;
+		DeXState.targetPlayer = nil;
+	else
+		DeXState.targetPlayer = getNearestPlayerToMouse();
+		if (DeXState.targetPlayer and DeXState.targetPlayer.Character) then
+			local part = getBodyPart(DeXState.targetPlayer.Character, DeXState.bodyPartSelected);
+			if part then
+				DeXState.isLockedOn = true;
+			end
+		end
+	end
 end
-
 local function CalculateChancePercentage(percentage)
-    local chance = math.floor(math.random() * 100) + 1
-    return chance <= percentage
+	local chance = math.floor(math.random() * 100) + 1;
+	return chance <= percentage;
 end
-
 local function getClosestPlayerForSilentAim()
-    local closest = nil
-    local shortestDistance = SilentAimSettings.FOVRadius or 130
-    local center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-
-    for _, player in pairs(Players:GetPlayers()) do  
-        if player ~= Players.LocalPlayer and player.Character and player.Character:FindFirstChild(SilentAimSettings.TargetPart) then  
-            if SilentAimSettings.TeamCheck and player.Team == Players.LocalPlayer.Team then  
-                continue  
-            end  
-            local part = player.Character[SilentAimSettings.TargetPart]  
-            local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)  
-            if onScreen then  
-                local distance = (Vector2.new(screenPos.X, screenPos.Y) - center).Magnitude  
-                if distance < shortestDistance then  
-                    closest = part  
-                    shortestDistance = distance  
-                end  
-            end  
-        end  
-    end  
-    return closest  
+	local closest = nil;
+	local shortestDistance = SilentAimSettings.FOVRadius or 130;
+	local center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2);
+	for _, player in pairs(Players:GetPlayers()) do
+		if ((player ~= Players.LocalPlayer) and player.Character and player.Character:FindFirstChild(SilentAimSettings.TargetPart)) then
+			if (SilentAimSettings.TeamCheck and (player.Team == Players.LocalPlayer.Team)) then
+				continue;
+			end
+			local part = player.Character[SilentAimSettings.TargetPart];
+			local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position);
+			if onScreen then
+				local distance = (Vector2.new(screenPos.X, screenPos.Y) - center).Magnitude;
+				if (distance < shortestDistance) then
+					closest = part;
+					shortestDistance = distance;
+				end
+			end
+		end
+	end
+	return closest;
 end
-
 local function HSVToRGB(h, s, v)
-    local c = v * s
-    local x = c * (1 - math.abs((h / 60) % 2 - 1))
-    local m = v - c
-    local r, g, b = 0, 0, 0
-
-    if h < 60 then r, g, b = c, x, 0  
-    elseif h < 120 then r, g, b = x, c, 0  
-    elseif h < 180 then r, g, b = 0, c, x  
-    elseif h < 240 then r, g, b = 0, x, c  
-    elseif h < 300 then r, g, b = x, 0, c  
-    else r, g, b = c, 0, x  
-    end  
-    return Color3.new(r + m, g + m, b + m)  
+	local c = v * s;
+	local x = c * (1 - math.abs(((h / 60) % 2) - 1));
+	local m = v - c;
+	local r, g, b = 0, 0, 0;
+	if (h < 60) then
+		r, g, b = c, x, 0;
+	elseif (h < 120) then
+		r, g, b = x, c, 0;
+	elseif (h < 180) then
+		r, g, b = 0, c, x;
+	elseif (h < 240) then
+		r, g, b = 0, x, c;
+	elseif (h < 300) then
+		r, g, b = x, 0, c;
+	else
+		r, g, b = c, 0, x;
+	end
+	return Color3.new(r + m, g + m, b + m);
 end
-
 local function handleFly()
-    if not DeXState.isFlyActive or not Players.LocalPlayer.Character or not DeXState.masterToggle then 
-        if flyBodyVelocity then
-            flyBodyVelocity:Destroy()
-            flyBodyVelocity = nil
-        end
-        if flyBodyGyro then
-            flyBodyGyro:Destroy()
-            flyBodyGyro = nil
-        end
-        return 
-    end
-    
-    local character = Players.LocalPlayer.Character
-    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-    if not humanoidRootPart then return end
-    
-    -- Create fly objects if they don't exist
-    if not flyBodyVelocity then
-        flyBodyVelocity = Instance.new("BodyVelocity")
-        flyBodyVelocity.MaxForce = Vector3.new(10000, 10000, 10000)
-        flyBodyVelocity.Velocity = Vector3.new(0, 0, 0)
-        flyBodyVelocity.Parent = humanoidRootPart
-    end
-    
-    if not flyBodyGyro then
-        flyBodyGyro = Instance.new("BodyGyro")
-        flyBodyGyro.MaxTorque = Vector3.new(10000, 10000, 10000)
-        flyBodyGyro.P = 1000
-        flyBodyGyro.D = 50
-        flyBodyGyro.CFrame = humanoidRootPart.CFrame
-        flyBodyGyro.Parent = humanoidRootPart
-    end
-    
-    -- Update fly controls
-    local flyDirection = Vector3.new(0, 0, 0)
-    
-    if keysPressed[Enum.KeyCode.W] then
-        flyDirection = flyDirection + (Camera.CFrame.LookVector * DeXState.flySpeed)
-    end
-    if keysPressed[Enum.KeyCode.S] then
-        flyDirection = flyDirection - (Camera.CFrame.LookVector * DeXState.flySpeed)
-    end
-    if keysPressed[Enum.KeyCode.A] then
-        flyDirection = flyDirection - (Camera.CFrame.RightVector * DeXState.flySpeed)
-    end
-    if keysPressed[Enum.KeyCode.D] then
-        flyDirection = flyDirection + (Camera.CFrame.RightVector * DeXState.flySpeed)
-    end
-    if keysPressed[Enum.KeyCode.Space] then
-        flyDirection = flyDirection + (Vector3.new(0, 1, 0) * DeXState.flySpeed)
-    end
-    if keysPressed[Enum.KeyCode.LeftControl] or keysPressed[Enum.KeyCode.LeftShift] then
-        flyDirection = flyDirection - (Vector3.new(0, 1, 0) * DeXState.flySpeed)
-    end
-    
-    -- Apply fly velocity
-    if flyBodyVelocity then
-        flyBodyVelocity.Velocity = flyDirection
-    end
-    
-    -- Keep gyro aligned with camera
-    if flyBodyGyro then
-        flyBodyGyro.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + Camera.CFrame.LookVector)
-    end
+	if (not DeXState.isFlyActive or not Players.LocalPlayer.Character or not DeXState.masterToggle) then
+		if flyBodyVelocity then
+			flyBodyVelocity:Destroy();
+			flyBodyVelocity = nil;
+		end
+		if flyBodyGyro then
+			flyBodyGyro:Destroy();
+			flyBodyGyro = nil;
+		end
+		return;
+	end
+	local character = Players.LocalPlayer.Character;
+	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart");
+	if not humanoidRootPart then
+		return;
+	end
+	if not flyBodyVelocity then
+		flyBodyVelocity = Instance.new("BodyVelocity");
+		flyBodyVelocity.MaxForce = Vector3.new(10000, 10000, 10000);
+		flyBodyVelocity.Velocity = Vector3.new(0, 0, 0);
+		flyBodyVelocity.Parent = humanoidRootPart;
+	end
+	if not flyBodyGyro then
+		flyBodyGyro = Instance.new("BodyGyro");
+		flyBodyGyro.MaxTorque = Vector3.new(10000, 10000, 10000);
+		flyBodyGyro.P = 1000;
+		flyBodyGyro.D = 50;
+		flyBodyGyro.CFrame = humanoidRootPart.CFrame;
+		flyBodyGyro.Parent = humanoidRootPart;
+	end
+	local flyDirection = Vector3.new(0, 0, 0);
+	if keysPressed[Enum.KeyCode.W] then
+		flyDirection = flyDirection + (Camera.CFrame.LookVector * DeXState.flySpeed);
+	end
+	if keysPressed[Enum.KeyCode.S] then
+		flyDirection = flyDirection - (Camera.CFrame.LookVector * DeXState.flySpeed);
+	end
+	if keysPressed[Enum.KeyCode.A] then
+		flyDirection = flyDirection - (Camera.CFrame.RightVector * DeXState.flySpeed);
+	end
+	if keysPressed[Enum.KeyCode.D] then
+		flyDirection = flyDirection + (Camera.CFrame.RightVector * DeXState.flySpeed);
+	end
+	if keysPressed[Enum.KeyCode.Space] then
+		flyDirection = flyDirection + (Vector3.new(0, 1, 0) * DeXState.flySpeed);
+	end
+	if (keysPressed[Enum.KeyCode.LeftControl] or keysPressed[Enum.KeyCode.LeftShift]) then
+		flyDirection = flyDirection - (Vector3.new(0, 1, 0) * DeXState.flySpeed);
+	end
+	if flyBodyVelocity then
+		flyBodyVelocity.Velocity = flyDirection;
+	end
+	if flyBodyGyro then
+		flyBodyGyro.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + Camera.CFrame.LookVector);
+	end
 end
-
 local function handleMovement()
-    if not DeXState.masterToggle then return end
-
-    -- Handle walkspeed
-    if DeXState.isSpeedActive then
-        setWalkSpeed(DeXState.flySpeed)
-    else
-        setWalkSpeed(getgenv().originalWalkSpeed or 16)
-    end
-    
-    -- Handle noclip
-    if DeXState.isNoClipActive and Players.LocalPlayer.Character then
-        for _, part in pairs(Players.LocalPlayer.Character:GetChildren()) do
-            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                part.CanCollide = false
-            end
-        end
-    end
-    
-    -- Handle fly
-    handleFly()
+	if not DeXState.masterToggle then
+		return;
+	end
+	if DeXState.isSpeedActive then
+		setWalkSpeed(DeXState.flySpeed);
+	else
+		setWalkSpeed(getgenv().originalWalkSpeed or 16);
+	end
+	if (DeXState.isNoClipActive and Players.LocalPlayer.Character) then
+		for _, part in pairs(Players.LocalPlayer.Character:GetChildren()) do
+			if (part:IsA("BasePart") and (part.Name ~= "HumanoidRootPart")) then
+				part.CanCollide = false;
+			end
+		end
+	end
+	handleFly();
 end
-
 local function handleStrafe()
-    if not DeXState.strafeEnabled or not DeXState.targetPlayer or not DeXState.masterToggle then return end
-
-    local char = Players.LocalPlayer.Character  
-    if not char or not char:FindFirstChild("HumanoidRootPart") then return end  
-    
-    local hrp = char.HumanoidRootPart  
-    local targetHrp = DeXState.targetPlayer.Character and DeXState.targetPlayer.Character:FindFirstChild("HumanoidRootPart")  
-    if not targetHrp then return end  
-    
-    local angle = tick() * (DeXState.strafeSpeed / 10)  
-    local radius = DeXState.strafeRadius  
-    
-    local offsetX = math.cos(angle) * radius  
-    local offsetZ = math.sin(angle) * radius  
-    
-    local targetPos = targetHrp.Position + Vector3.new(offsetX, 0, offsetZ)  
-    local direction = (targetPos - hrp.Position).Unit  
-    
-    hrp.Velocity = Vector3.new(direction.X * DeXState.strafeSpeed, hrp.Velocity.Y, direction.Z * DeXState.strafeSpeed)  
+	if (not DeXState.strafeEnabled or not DeXState.targetPlayer or not DeXState.masterToggle) then
+		return;
+	end
+	local char = Players.LocalPlayer.Character;
+	if (not char or not char:FindFirstChild("HumanoidRootPart")) then
+		return;
+	end
+	local hrp = char.HumanoidRootPart;
+	local targetHrp = DeXState.targetPlayer.Character and DeXState.targetPlayer.Character:FindFirstChild("HumanoidRootPart");
+	if not targetHrp then
+		return;
+	end
+	local angle = tick() * (DeXState.strafeSpeed / 10);
+	local radius = DeXState.strafeRadius;
+	local offsetX = math.cos(angle) * radius;
+	local offsetZ = math.sin(angle) * radius;
+	local targetPos = targetHrp.Position + Vector3.new(offsetX, 0, offsetZ);
+	local direction = (targetPos - hrp.Position).Unit;
+	hrp.Velocity = Vector3.new(direction.X * DeXState.strafeSpeed, hrp.Velocity.Y, direction.Z * DeXState.strafeSpeed);
 end
-
 local function setupKeybinds()
-    for _, connection in pairs(keybindConnections) do
-        if connection then
-            connection:Disconnect()
-        end
-    end
-    keybindConnections = {}
-
-    keybindConnections[#keybindConnections + 1] = UserInputService.InputBegan:Connect(function(input, gameProcessed)  
-        if gameProcessed then return end  
-          
-        keysPressed[input.KeyCode] = true  
-          
-        if input.KeyCode == DeXState.aimLockKeybind then  
-            toggleLockOnPlayer()  
-        end  
-          
-        if input.KeyCode == DeXState.speedKeybind then  
-            DeXState.isSpeedActive = not DeXState.isSpeedActive
-            setWalkSpeed(DeXState.isSpeedActive and DeXState.flySpeed or (getgenv().originalWalkSpeed or 16))
-        end  
-          
-        if input.KeyCode == DeXState.flyKeybind then  
-            DeXState.isFlyActive = not DeXState.isFlyActive
-            if not DeXState.isFlyActive then
-                if flyBodyVelocity then
-                    flyBodyVelocity:Destroy()
-                    flyBodyVelocity = nil
-                end
-                if flyBodyGyro then
-                    flyBodyGyro:Destroy()
-                    flyBodyGyro = nil
-                end
-            end
-        end  
-          
-        if input.KeyCode == DeXState.noclipKeybind then  
-            DeXState.isNoClipActive = not DeXState.isNoClipActive  
-        end  
-          
-        if input.KeyCode == DeXState.strafeKeybind then  
-            DeXState.strafeEnabled = not DeXState.strafeEnabled  
-        end  
-    end)  
-    
-    keybindConnections[#keybindConnections + 1] = UserInputService.InputEnded:Connect(function(input, gameProcessed)  
-        keysPressed[input.KeyCode] = false  
-    end)  
+	for _, connection in pairs(keybindConnections) do
+		if connection then
+			connection:Disconnect();
+		end
+	end
+	keybindConnections = {};
+	keybindConnections[#keybindConnections + 1] = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if gameProcessed then
+			return;
+		end
+		keysPressed[input.KeyCode] = true;
+		if (input.KeyCode == DeXState.aimLockKeybind) then
+			toggleLockOnPlayer();
+		end
+		if (input.KeyCode == DeXState.speedKeybind) then
+			DeXState.isSpeedActive = not DeXState.isSpeedActive;
+			setWalkSpeed((DeXState.isSpeedActive and DeXState.flySpeed) or getgenv().originalWalkSpeed or 16);
+		end
+		if (input.KeyCode == DeXState.flyKeybind) then
+			DeXState.isFlyActive = not DeXState.isFlyActive;
+			if not DeXState.isFlyActive then
+				if flyBodyVelocity then
+					flyBodyVelocity:Destroy();
+					flyBodyVelocity = nil;
+				end
+				if flyBodyGyro then
+					flyBodyGyro:Destroy();
+					flyBodyGyro = nil;
+				end
+			end
+		end
+		if (input.KeyCode == DeXState.noclipKeybind) then
+			DeXState.isNoClipActive = not DeXState.isNoClipActive;
+		end
+		if (input.KeyCode == DeXState.strafeKeybind) then
+			DeXState.strafeEnabled = not DeXState.strafeEnabled;
+		end
+	end);
+	keybindConnections[#keybindConnections + 1] = UserInputService.InputEnded:Connect(function(input, gameProcessed)
+		keysPressed[input.KeyCode] = false;
+	end);
 end
-
 local function createUI()
-    if CoreGui:FindFirstChild("DeXModernUI") then
-        CoreGui:FindFirstChild("DeXModernUI"):Destroy()
-    end
-
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "DeXModernUI"
-    ScreenGui.Parent = CoreGui
-    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Name = "MainFrame"
-    MainFrame.Parent = ScreenGui
-    MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    MainFrame.BorderSizePixel = 0
-    MainFrame.Position = UDim2.new(0.5, -400, 0.5, -350)
-    MainFrame.Size = UDim2.new(0, 800, 0, 700)
-    MainFrame.ClipsDescendants = true
-
-    local MainCorner = Instance.new("UICorner")
-    MainCorner.CornerRadius = UDim.new(0, 12)
-    MainCorner.Parent = MainFrame
-
-    local Gradient = Instance.new("UIGradient")
-    Gradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 30)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
-    }
-    Gradient.Rotation = 45
-    Gradient.Parent = MainFrame
-
-    local TitleBar = Instance.new("Frame")
-    TitleBar.Name = "TitleBar"
-    TitleBar.Parent = MainFrame
-    TitleBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    TitleBar.BorderSizePixel = 0
-    TitleBar.Size = UDim2.new(1, 0, 0, 40)
-
-    local TitleCorner = Instance.new("UICorner")
-    TitleCorner.CornerRadius = UDim.new(0, 12)
-    TitleCorner.Parent = TitleBar
-
-    local Title = Instance.new("TextLabel")
-    Title.Name = "Title"
-    Title.Parent = TitleBar
-    Title.BackgroundTransparency = 1
-    Title.Position = UDim2.new(0, 15, 0, 0)
-    Title.Size = UDim2.new(1, -60, 1, 0)
-    Title.Font = Enum.Font.GothamBold
-    Title.Text = "DeX DaHood - Version 0.0.1"
-    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Title.TextSize = 18
-    Title.TextXAlignment = Enum.TextXAlignment.Left
-
-    local CloseButton = Instance.new("TextButton")
-    CloseButton.Name = "CloseButton"
-    CloseButton.Parent = TitleBar
-    CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
-    CloseButton.BorderSizePixel = 0
-    CloseButton.Position = UDim2.new(1, -35, 0, 5)
-    CloseButton.Size = UDim2.new(0, 30, 0, 30)
-    CloseButton.Font = Enum.Font.GothamBold
-    CloseButton.Text = "×"
-    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    CloseButton.TextSize = 18
-
-    local CloseCorner = Instance.new("UICorner")
-    CloseCorner.CornerRadius = UDim.new(0, 8)
-    CloseCorner.Parent = CloseButton
-
-    local TabContainer = Instance.new("Frame")
-    TabContainer.Name = "TabContainer"
-    TabContainer.Parent = MainFrame
-    TabContainer.BackgroundTransparency = 1
-    TabContainer.Position = UDim2.new(0, 0, 0, 40)
-    TabContainer.Size = UDim2.new(1, 0, 0, 50)
-
-    local ContentContainer = Instance.new("Frame")
-    ContentContainer.Name = "ContentContainer"
-    ContentContainer.Parent = MainFrame
-    ContentContainer.BackgroundTransparency = 1
-    ContentContainer.Position = UDim2.new(0, 10, 0, 90)
-    ContentContainer.Size = UDim2.new(1, -20, 1, -100)
-    ContentContainer.ClipsDescendants = true
-
-    local tabs = {}
-    local currentTab = nil
-
-    local function createTab(name, isDefault)
-        local TabButton = Instance.new("TextButton")
-        TabButton.Name = name .. "Tab"
-        TabButton.Parent = TabContainer
-        TabButton.BackgroundColor3 = isDefault and Color3.fromRGB(70, 130, 255) or Color3.fromRGB(50, 50, 50)
-        TabButton.BorderSizePixel = 0
-        TabButton.Size = UDim2.new(0, 120, 0, 35)
-        TabButton.Font = Enum.Font.Gotham
-        TabButton.Text = name
-        TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        TabButton.TextSize = 14
-
-        local TabCorner = Instance.new("UICorner")
-        TabCorner.CornerRadius = UDim.new(0, 8)
-        TabCorner.Parent = TabButton
-
-        local TabContent = Instance.new("ScrollingFrame")
-        TabContent.Name = name .. "Content"
-        TabContent.Parent = ContentContainer
-        TabContent.BackgroundTransparency = 1
-        TabContent.Size = UDim2.new(1, 0, 1, 0)
-        TabContent.ScrollBarThickness = 6
-        TabContent.ScrollBarImageColor3 = Color3.fromRGB(70, 130, 255)
-        TabContent.Visible = isDefault or false
-        TabContent.CanvasSize = UDim2.new(0, 0, 0, 0)
-        TabContent.AutomaticCanvasSize = Enum.AutomaticSize.Y
-
-        local UIListLayout = Instance.new("UIListLayout")
-        UIListLayout.Parent = TabContent
-        UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        UIListLayout.Padding = UDim.new(0, 5)
-
-        tabs[name] = {
-            button = TabButton,
-            content = TabContent
-        }
-
-        if isDefault then
-            currentTab = name
-        end
-
-        TabButton.MouseButton1Click:Connect(function()
-            for tabName, tab in pairs(tabs) do
-                local isActive = tabName == name
-                tab.content.Visible = isActive
-                tab.button.BackgroundColor3 = isActive and Color3.fromRGB(70, 130, 255) or Color3.fromRGB(50, 50, 50)
-            end
-            currentTab = name
-        end)
-
-        return TabContent
-    end
-
-    -- Create tabs first
-    local AimTab = createTab("Aim", true)
-    local VisualsTab = createTab("Visuals", false)
-    local MovementTab = createTab("Movement", false)
-    local SettingsTab = createTab("Settings", false)
-    local KeybindsTab = createTab("Keybinds", false)
-    
-    -- Position tabs after creating them
-    local tabIndex = 0
-    for tabName, tab in pairs(tabs) do
-        tab.button.Position = UDim2.new(0, 10 + (tabIndex * 130), 0, 7.5)
-        tabIndex = tabIndex + 1
-    end
-
-    local yOffset = 0
-
-    local function createToggle(parent, text, default, callback)
-        local ToggleFrame = Instance.new("Frame")
-        ToggleFrame.Name = text .. "Toggle"
-        ToggleFrame.Parent = parent
-        ToggleFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        ToggleFrame.BorderSizePixel = 0
-        ToggleFrame.Size = UDim2.new(1, -20, 0, 40)
-        ToggleFrame.LayoutOrder = yOffset
-
-        local ToggleCorner = Instance.new("UICorner")
-        ToggleCorner.CornerRadius = UDim.new(0, 8)
-        ToggleCorner.Parent = ToggleFrame
-
-        local ToggleLabel = Instance.new("TextLabel")
-        ToggleLabel.Parent = ToggleFrame
-        ToggleLabel.BackgroundTransparency = 1
-        ToggleLabel.Position = UDim2.new(0, 15, 0, 0)
-        ToggleLabel.Size = UDim2.new(1, -60, 1, 0)
-        ToggleLabel.Font = Enum.Font.Gotham
-        ToggleLabel.Text = text
-        ToggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        ToggleLabel.TextSize = 14
-        ToggleLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-        local ToggleButton = Instance.new("TextButton")
-        ToggleButton.Parent = ToggleFrame
-        ToggleButton.BackgroundColor3 = default and Color3.fromRGB(70, 130, 255) or Color3.fromRGB(60, 60, 60)
-        ToggleButton.BorderSizePixel = 0
-        ToggleButton.Position = UDim2.new(1, -40, 0, 10)
-        ToggleButton.Size = UDim2.new(0, 30, 0, 20)
-        ToggleButton.Text = ""
-
-        local ButtonCorner = Instance.new("UICorner")
-        ButtonCorner.CornerRadius = UDim.new(0, 10)
-        ButtonCorner.Parent = ToggleButton
-
-        local isEnabled = default
-
-        ToggleButton.MouseButton1Click:Connect(function()
-            isEnabled = not isEnabled
-            ToggleButton.BackgroundColor3 = isEnabled and Color3.fromRGB(70, 130, 255) or Color3.fromRGB(60, 60, 60)
-            if callback then callback(isEnabled) end
-        end)
-
-        yOffset = yOffset + 1
-        return {
-            frame = ToggleFrame, 
-            getValue = function() return isEnabled end, 
-            setValue = function(val) 
-                isEnabled = val
-                ToggleButton.BackgroundColor3 = isEnabled and Color3.fromRGB(70, 130, 255) or Color3.fromRGB(60, 60, 60)
-            end
-        }
-    end
-
-    local function createSlider(parent, text, min, max, default, callback)
-        local SliderFrame = Instance.new("Frame")
-        SliderFrame.Name = text .. "Slider"
-        SliderFrame.Parent = parent
-        SliderFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        SliderFrame.BorderSizePixel = 0
-        SliderFrame.Size = UDim2.new(1, -20, 0, 60)
-        SliderFrame.LayoutOrder = yOffset
-
-        local SliderCorner = Instance.new("UICorner")
-        SliderCorner.CornerRadius = UDim.new(0, 8)
-        SliderCorner.Parent = SliderFrame
-
-        local SliderLabel = Instance.new("TextLabel")
-        SliderLabel.Parent = SliderFrame
-        SliderLabel.BackgroundTransparency = 1
-        SliderLabel.Position = UDim2.new(0, 15, 0, 5)
-        SliderLabel.Size = UDim2.new(1, -30, 0, 20)
-        SliderLabel.Font = Enum.Font.Gotham
-        SliderLabel.Text = text .. ": " .. tostring(default)
-        SliderLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        SliderLabel.TextSize = 14
-        SliderLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-        local SliderBar = Instance.new("Frame")
-        SliderBar.Parent = SliderFrame
-        SliderBar.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        SliderBar.BorderSizePixel = 0
-        SliderBar.Position = UDim2.new(0, 15, 0, 35)
-        SliderBar.Size = UDim2.new(1, -30, 0, 6)
-
-        local BarCorner = Instance.new("UICorner")
-        BarCorner.CornerRadius = UDim.new(0, 3)
-        BarCorner.Parent = SliderBar
-
-        local SliderFill = Instance.new("Frame")
-        SliderFill.Parent = SliderBar
-        SliderFill.BackgroundColor3 = Color3.fromRGB(70, 130, 255)
-        SliderFill.BorderSizePixel = 0
-        SliderFill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
-
-        local FillCorner = Instance.new("UICorner")
-        FillCorner.CornerRadius = UDim.new(0, 3)
-        FillCorner.Parent = SliderFill
-
-        local SliderButton = Instance.new("TextButton")
-        SliderButton.Parent = SliderBar
-        SliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        SliderButton.BorderSizePixel = 0
-        SliderButton.Position = UDim2.new((default - min) / (max - min), -8, 0, -6)
-        SliderButton.Size = UDim2.new(0, 16, 0, 18)
-        SliderButton.Text = ""
-
-        local ButtonCorner = Instance.new("UICorner")
-        ButtonCorner.CornerRadius = UDim.new(0, 8)
-        ButtonCorner.Parent = SliderButton
-
-        local currentValue = default
-        local dragging = false
-
-        local function updateSlider()
-            SliderLabel.Text = text .. ": " .. tostring(math.floor(currentValue * 100) / 100)
-            local percentage = (currentValue - min) / (max - min)
-            SliderFill.Size = UDim2.new(percentage, 0, 1, 0)
-            SliderButton.Position = UDim2.new(percentage, -8, 0, -6)
-            if callback then callback(currentValue) end
-        end
-
-        SliderButton.MouseButton1Down:Connect(function()
-            dragging = true
-        end)
-
-        local connection
-        connection = UserInputService.InputEnded:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                dragging = false
-            end
-        end)
-
-        local connection2
-        connection2 = UserInputService.InputChanged:Connect(function(input)
-            if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                local mousePos = UserInputService:GetMouseLocation()
-                local sliderPos = SliderBar.AbsolutePosition.X
-                local sliderSize = SliderBar.AbsoluteSize.X
-                local percentage = math.clamp((mousePos.X - sliderPos) / sliderSize, 0, 1)
-                currentValue = min + (percentage * (max - min))
-                updateSlider()
-            end
-        end)
-
-        yOffset = yOffset + 1
-        return {
-            frame = SliderFrame, 
-            getValue = function() return currentValue end,
-            destroy = function()
-                if connection then connection:Disconnect() end
-                if connection2 then connection2:Disconnect() end
-            end
-        }
-    end
-
-    local function createDropdown(parent, text, options, default, callback)
-        local DropdownFrame = Instance.new("Frame")
-        DropdownFrame.Name = text .. "Dropdown"
-        DropdownFrame.Parent = parent
-        DropdownFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        DropdownFrame.BorderSizePixel = 0
-        DropdownFrame.Size = UDim2.new(1, -20, 0, 40)
-        DropdownFrame.LayoutOrder = yOffset
-        DropdownFrame.ClipsDescendants = true
-
-        local DropdownCorner = Instance.new("UICorner")
-        DropdownCorner.CornerRadius = UDim.new(0, 8)
-        DropdownCorner.Parent = DropdownFrame
-
-        local DropdownButton = Instance.new("TextButton")
-        DropdownButton.Parent = DropdownFrame
-        DropdownButton.BackgroundTransparency = 1
-        DropdownButton.Size = UDim2.new(1, 0, 1, 0)
-        DropdownButton.Font = Enum.Font.Gotham
-        DropdownButton.Text = text .. ": " .. (default or options[1] or "None")
-        DropdownButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        DropdownButton.TextSize = 14
-
-        local currentValue = default or options[1]
-        local isOpen = false
-
-        DropdownButton.MouseButton1Click:Connect(function()
-            isOpen = not isOpen
-            if isOpen then
-                DropdownFrame.Size = UDim2.new(1, -20, 0, 40 + (#options * 30))
-                for i, option in ipairs(options) do
-                    local OptionButton = Instance.new("TextButton")
-                    OptionButton.Name = "Option" .. i
-                    OptionButton.Parent = DropdownFrame
-                    OptionButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-                    OptionButton.BorderSizePixel = 0
-                    OptionButton.Position = UDim2.new(0, 0, 0, 40 + ((i-1) * 30))
-                    OptionButton.Size = UDim2.new(1, 0, 0, 30)
-                    OptionButton.Font = Enum.Font.Gotham
-                    OptionButton.Text = option
-                    OptionButton.TextColor3 = Color3.fromRGB(200, 200, 200)
-                    OptionButton.TextSize = 12
-                    
-                    OptionButton.MouseButton1Click:Connect(function()
-                        currentValue = option
-                        DropdownButton.Text = text .. ": " .. option
-                        if callback then callback(option) end
-                        
-                        for j = 1, #options do
-                            local opt = DropdownFrame:FindFirstChild("Option" .. j)
-                            if opt then opt:Destroy() end
-                        end
-                        DropdownFrame.Size = UDim2.new(1, -20, 0, 40)
-                        isOpen = false
-                    end)
-                end
-            else
-                for j = 1, #options do
-                    local opt = DropdownFrame:FindFirstChild("Option" .. j)
-                    if opt then opt:Destroy() end
-                end
-                DropdownFrame.Size = UDim2.new(1, -20, 0, 40)
-            end
-        end)
-
-        yOffset = yOffset + 1
-        return {
-            frame = DropdownFrame, 
-            getValue = function() return currentValue end
-        }
-    end
-
-    local function createKeybind(parent, text, default, callback)
-        local KeybindFrame = Instance.new("Frame")
-        KeybindFrame.Name = text .. "Keybind"
-        KeybindFrame.Parent = parent
-        KeybindFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        KeybindFrame.BorderSizePixel = 0
-        KeybindFrame.Size = UDim2.new(1, -20, 0, 40)
-        KeybindFrame.LayoutOrder = yOffset
-
-        local KeybindCorner = Instance.new("UICorner")
-        KeybindCorner.CornerRadius = UDim.new(0, 8)
-        KeybindCorner.Parent = KeybindFrame
-
-        local KeybindLabel = Instance.new("TextLabel")
-        KeybindLabel.Parent = KeybindFrame
-        KeybindLabel.BackgroundTransparency = 1
-        KeybindLabel.Position = UDim2.new(0, 15, 0, 0)
-        KeybindLabel.Size = UDim2.new(1, -120, 1, 0)
-        KeybindLabel.Font = Enum.Font.Gotham
-        KeybindLabel.Text = text
-        KeybindLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        KeybindLabel.TextSize = 14
-        KeybindLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-        local KeybindButton = Instance.new("TextButton")
-        KeybindButton.Parent = KeybindFrame
-        KeybindButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        KeybindButton.BorderSizePixel = 0
-        KeybindButton.Position = UDim2.new(1, -100, 0, 5)
-        KeybindButton.Size = UDim2.new(0, 90, 0, 30)
-        KeybindButton.Font = Enum.Font.Gotham
-        KeybindButton.Text = default.Name
-        KeybindButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        KeybindButton.TextSize = 12
-
-        local ButtonCorner = Instance.new("UICorner")
-        ButtonCorner.CornerRadius = UDim.new(0, 6)
-        ButtonCorner.Parent = KeybindButton
-
-        local currentKey = default
-        local isBinding = false
-
-        KeybindButton.MouseButton1Click:Connect(function()
-            if isBinding then return end
-            isBinding = true
-            KeybindButton.Text = "Press Key..."
-            KeybindButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-            
-            local connection
-            connection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-                if input.UserInputType == Enum.UserInputType.Keyboard then
-                    currentKey = input.KeyCode
-                    KeybindButton.Text = input.KeyCode.Name
-                    KeybindButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-                    isBinding = false
-                    connection:Disconnect()
-                    if callback then callback(currentKey) end
-                end
-            end)
-        end)
-
-        yOffset = yOffset + 1
-        return {
-            frame = KeybindFrame, 
-            getValue = function() return currentKey end
-        }
-    end
-
-    local function createColorPicker(parent, text, default, callback)
-        local ColorFrame = Instance.new("Frame")
-        ColorFrame.Name = text .. "ColorPicker"
-        ColorFrame.Parent = parent
-        ColorFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        ColorFrame.BorderSizePixel = 0
-        ColorFrame.Size = UDim2.new(1, -20, 0, 40)
-        ColorFrame.LayoutOrder = yOffset
-
-        local ColorCorner = Instance.new("UICorner")
-        ColorCorner.CornerRadius = UDim.new(0, 8)
-        ColorCorner.Parent = ColorFrame
-
-        local ColorLabel = Instance.new("TextLabel")
-        ColorLabel.Parent = ColorFrame
-        ColorLabel.BackgroundTransparency = 1
-        ColorLabel.Position = UDim2.new(0, 15, 0, 0)
-        ColorLabel.Size = UDim2.new(1, -60, 1, 0)
-        ColorLabel.Font = Enum.Font.Gotham
-        ColorLabel.Text = text
-        ColorLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        ColorLabel.TextSize = 14
-        ColorLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-        local ColorButton = Instance.new("TextButton")
-        ColorButton.Parent = ColorFrame
-        ColorButton.BackgroundColor3 = default
-        ColorButton.BorderSizePixel = 0
-        ColorButton.Position = UDim2.new(1, -40, 0, 10)
-        ColorButton.Size = UDim2.new(0, 30, 0, 20)
-        ColorButton.Text = ""
-
-        local ButtonCorner = Instance.new("UICorner")
-        ButtonCorner.CornerRadius = UDim.new(0, 4)
-        ButtonCorner.Parent = ColorButton
-
-        local currentColor = default
-
-        ColorButton.MouseButton1Click:Connect(function()
-            local colors = {
-                Color3.fromRGB(255, 255, 255),
-                Color3.fromRGB(255, 0, 0),
-                Color3.fromRGB(0, 255, 0),
-                Color3.fromRGB(0, 0, 255),
-                Color3.fromRGB(255, 255, 0),
-                Color3.fromRGB(255, 0, 255),
-                Color3.fromRGB(0, 255, 255)
-            }
-            
-            for i, color in ipairs(colors) do
-                if currentColor == color then
-                    currentColor = colors[i + 1] or colors[1]
-                    break
-                elseif i == #colors then
-                    currentColor = colors[1]
-                end
-            end
-            
-            ColorButton.BackgroundColor3 = currentColor
-            if callback then callback(currentColor) end
-        end)
-
-        yOffset = yOffset + 1
-        return {
-            frame = ColorFrame, 
-            getValue = function() return currentColor end
-        }
-    end
-
-    -- Reset yOffset for each tab
-    yOffset = 0
-    
-    -- Aim Tab
-    createToggle(AimTab, "Master Toggle", true, function(val)
-        DeXState.masterToggle = val
-    end)
-    
-    createToggle(AimTab, "Enable AimLock", false, function(val)
-        DeXState.aimLockEnabled = val
-        if not val then
-            DeXState.lockEnabled = false
-            DeXState.isLockedOn = false
-            DeXState.targetPlayer = nil
-        end
-    end)
-    
-    createToggle(AimTab, "AimLock Keybind", false, function(val)
-        DeXState.lockEnabled = val
-        if not val then
-            DeXState.isLockedOn = false
-            DeXState.targetPlayer = nil
-        end
-    end)
-    
-    createSlider(AimTab, "Camera Smoothing", 0, 1, 0.1, function(val)
-        DeXState.smoothingFactor = val
-    end)
-    
-    createSlider(AimTab, "Prediction Factor", 0, 2, 0.0, function(val)
-        DeXState.predictionFactor = val
-    end)
-    
-    createSlider(AimTab, "Locked Time", 1, 30, 12, function(val)
-        DeXState.lockedTime = val
-    end)
-    
-    createDropdown(AimTab, "Target Body Part", {"Head", "UpperTorso", "RightUpperArm", "LeftUpperLeg", "RightUpperLeg", "LeftUpperArm"}, "Head", function(val)
-        DeXState.bodyPartSelected = val
-    end)
-    
-    createToggle(AimTab, "Anti-Lock", false, function(val)
-        DeXState.antiLockEnabled = val
-    end)
-    
-    createSlider(AimTab, "Resolver Intensity", 0.1, 3.0, 1.0, function(val)
-        DeXState.resolverIntensity = val
-    end)
-    
-    createSlider(AimTab, "Reverse Resolve Intensity", 1, 10, 5, function(val)
-        DeXState.reverseResolveIntensity = val
-    end)
-    
-    createDropdown(AimTab, "Resolver Method", {"Recalculate", "Randomize", "Invert"}, "Recalculate", function(val)
-        DeXState.resolverMethod = val
-    end)
-    
-    createToggle(AimTab, "Desync", false, function(val)
-        DeXState.Desync = val
-    end)
-    
-    createToggle(AimTab, "Desync Enabled", false, function(val)
-        DeXState.DesyncEnabled = val
-    end)
-    
-    createToggle(AimTab, "Silent Aim", false, function(val)
-        DeXState.silentAimEnabled = val
-        SilentAimSettings.Enabled = val
-    end)
-    
-    createToggle(AimTab, "Team Check", false, function(val)
-        DeXState.teamCheck = val
-        SilentAimSettings.TeamCheck = val
-    end)
-    
-    createToggle(AimTab, "Bullet Teleport", false, function(val)
-        DeXState.bulletTeleport = val
-        SilentAimSettings.BulletTP = val
-    end)
-    
-    createDropdown(AimTab, "Silent Target Part", {"Head", "HumanoidRootPart", "UpperTorso"}, "HumanoidRootPart", function(val)
-        DeXState.targetPart = val
-        SilentAimSettings.TargetPart = val
-    end)
-    
-    createDropdown(AimTab, "Silent Aim Method", {"Raycast", "FindPartOnRay", "ViewportPointToRay", "ScreenPointToRay"}, "Raycast", function(val)
-        DeXState.silentAimMethod = val
-        SilentAimSettings.SilentAimMethod = val
-    end)
-    
-    createSlider(AimTab, "Hit Chance %", 0, 100, 100, function(val)
-        DeXState.hitChance = val
-        SilentAimSettings.HitChance = val
-    end)
-    
-    -- Visuals Tab
-    yOffset = 0
-    createToggle(VisualsTab, "Show FOV Circle", false, function(val)
-        DeXState.fovEnabled = val
-        fovcircle.Visible = val
-        SilentAimSettings.FOVVisible = val
-    end)
-    
-    createSlider(VisualsTab, "FOV Circle Radius", 0, 360, 130, function(val)
-        DeXState.fovValue = val
-        fovcircle.Radius = val
-        SilentAimSettings.FOVRadius = val
-    end)
-    
-    createToggle(VisualsTab, "Enable ESP", false, function(val)
-        DeXState.espEnabled = val
-        if not val then
-            clearESP()
-        else
-            for _, player in pairs(Players:GetPlayers()) do
-                if player ~= Players.LocalPlayer then
-                    createESP(player)
-                end
-            end
-        end
-    end)
-    
-    createToggle(VisualsTab, "ESP Team Check", false, function(val)
-        DeXState.espTeamCheck = val
-    end)
-    
-    createToggle(VisualsTab, "ESP Name Tag", false, function(val)
-        DeXState.espNameTag = val
-    end)
-    
-    createToggle(VisualsTab, "ESP Box", false, function(val)
-        DeXState.espBox = val
-    end)
-    
-    createToggle(VisualsTab, "ESP Health Bar", false, function(val)
-        DeXState.espHealthBar = val
-    end)
-    
-    createToggle(VisualsTab, "ESP Tracer", false, function(val)
-        DeXState.espTracer = val
-    end)
-    
-    createToggle(VisualsTab, "Self Chams", false, function(val)
-        DeXState.SelfChamsEnabled = val
-        if val then
-            if Players.LocalPlayer.Character then
-                applyChams(Players.LocalPlayer.Character, true)
-            end
-        else
-            removeChams(Players.LocalPlayer.Character)
-        end
-    end)
-    
-    createToggle(VisualsTab, "Other Player Chams", false, function(val)
-        DeXState.OtherChamsEnabled = val
-        if val then
-            for _, player in pairs(Players:GetPlayers()) do
-                if player ~= Players.LocalPlayer and player.Character then
-                    applyChams(player.Character, false)
-                end
-            end
-        else
-            for _, player in pairs(Players:GetPlayers()) do
-                if player ~= Players.LocalPlayer and player.Character then
-                    removeChams(player.Character)
-                end
-            end
-        end
-    end)
-    
-    createToggle(VisualsTab, "Rainbow Chams", false, function(val)
-        DeXState.RainbowChamsEnabled = val
-    end)
-    
-    createColorPicker(VisualsTab, "Self Chams Color", Color3.fromRGB(255, 255, 255), function(val)
-        DeXState.SelfChamsColor = val
-        if DeXState.SelfChamsEnabled and Players.LocalPlayer.Character then
-            removeChams(Players.LocalPlayer.Character)
-            applyChams(Players.LocalPlayer.Character, true)
-        end
-    end)
-    
-    createColorPicker(VisualsTab, "Other Chams Color", Color3.fromRGB(255, 0, 0), function(val)
-        DeXState.OtherChamsColor = val
-        if DeXState.OtherChamsEnabled then
-            for _, player in pairs(Players:GetPlayers()) do
-                if player ~= Players.LocalPlayer and player.Character then
-                    removeChams(player.Character)
-                    applyChams(player.Character, false)
-                end
-            end
-        end
-    end)
-    
-    createToggle(VisualsTab, "Nebula Theme", false, function(val)
-        DeXState.nebulaEnabled = val
-        if val then
-            local b = Instance.new("BloomEffect", Lighting)
-            b.Name = "NebulaBloom"
-            b.Intensity = 0.7
-            b.Size = 24
-            b.Threshold = 1
-
-            local c = Instance.new("ColorCorrectionEffect", Lighting)
-            c.Name = "NebulaColorCorrection"
-            c.Saturation = 0.5
-            c.Contrast = 0.2
-            c.TintColor = Color3.fromRGB(173, 216, 230)
-
-            local a = Instance.new("Atmosphere", Lighting)
-            a.Name = "NebulaAtmosphere"
-            a.Density = 0.4
-            a.Offset = 0.25
-            a.Glare = 1
-            a.Haze = 2
-            a.Color = Color3.fromRGB(25, 25, 112)
-            a.Decay = 1
-
-            Lighting.Aambient = Color3.fromRGB(173, 216, 230)
-            Lighting.OutdoorAmbient = Color3.fromRGB(173, 216, 230)
-            Lighting.FogStart = 100
-            Lighting.FogEnd = 500
-            Lighting.FogColor = Color3.fromRGB(173, 216, 230)
-        else
-            for _, effectName in pairs({"NebulaBloom", "NebulaColorCorrection", "NebulaAtmosphere"}) do
-                local effect = Lighting:FindFirstChild(effectName)
-                if effect then
-                    effect:Destroy()
-                end
-            end
-            Lighting.Ambient = Color3.new(0, 0, 0)
-            Lighting.OutdoorAmbient = Color3.new(0, 0, 0)
-            Lighting.FogStart = 0
-            Lighting.FogEnd = 1000
-            Lighting.FogColor = Color3.new(1, 1, 1)
-        end
-    end)
-    
-    createToggle(VisualsTab, "Hit Sound", false, function(val)
-        DeXState.hitSoundEnabled = val
-    end)
-    
-    createDropdown(VisualsTab, "Hit Sound", {"Neverlose", "Bameware", "Cod", "Minecraft", "Bubble", "RIFK7", "Gamesense", "Rust"}, "Neverlose", function(val)
-        if sounds[val] then
-            DeXState.hitSoundId = sounds[val]
-            hitSound.SoundId = sounds[val]
-        end
-    end)
-    
-    -- Movement Tab
-    yOffset = 0
-    createToggle(MovementTab, "Speed", false, function(val)
-        DeXState.isSpeedActive = val
-        setWalkSpeed(val and DeXState.flySpeed or (getgenv().originalWalkSpeed or 16))
-    end)
-    
-    createSlider(MovementTab, "Speed Multiplier", 1, 100, 50, function(val)
-        DeXState.flySpeed = val
-        if DeXState.isSpeedActive then
-            setWalkSpeed(val)
-        end
-    end)
-    
-    createToggle(MovementTab, "Fly", false, function(val)
-        DeXState.isFlyActive = val
-        if not val then
-            if flyBodyVelocity then
-                flyBodyVelocity:Destroy()
-                flyBodyVelocity = nil
-            end
-            if flyBodyGyro then
-                flyBodyGyro:Destroy()
-                flyBodyGyro = nil
-            end
-        end
-    end)
-    
-    createToggle(MovementTab, "NoClip", false, function(val)
-        DeXState.isNoClipActive = val
-    end)
-    
-    createToggle(MovementTab, "Target Strafe", false, function(val)
-        DeXState.strafeEnabled = val
-    end)
-    
-    createSlider(MovementTab, "Strafe Speed", 10, 100, 50, function(val)
-        DeXState.strafeSpeed = val
-    end)
-    
-    createSlider(MovementTab, "Strafe Radius", 1, 20, 5, function(val)
-        DeXState.strafeRadius = val
-    end)
-    
-    createDropdown(MovementTab, "Strafe Mode", {"Horizontal", "Vertical", "Random"}, "Horizontal", function(val)
-        DeXState.strafeMode = val
-    end)
-    
-    -- Keybinds Tab
-    yOffset = 0
-    createKeybind(KeybindsTab, "AimLock Keybind", DeXState.aimLockKeybind, function(key)
-        DeXState.aimLockKeybind = key
-        setupKeybinds()
-    end)
-    
-    createKeybind(KeybindsTab, "Menu Toggle", DeXState.menuKeybind, function(key)
-        DeXState.menuKeybind = key
-    end)
-    
-    createKeybind(KeybindsTab, "Fly Toggle", DeXState.flyKeybind, function(key)
-        DeXState.flyKeybind = key
-        setupKeybinds()
-    end)
-    
-    createKeybind(KeybindsTab, "Speed Toggle", DeXState.speedKeybind, function(key)
-        DeXState.speedKeybind = key
-        setupKeybinds()
-    end)
-    
-    createKeybind(KeybindsTab, "NoClip Toggle", DeXState.noclipKeybind, function(key)
-        DeXState.noclipKeybind = key
-        setupKeybinds()
-    end)
-    
-    createKeybind(KeybindsTab, "Strafe Toggle", DeXState.strafeKeybind, function(key)
-        DeXState.strafeKeybind = key
-        setupKeybinds()
-    end)
-    
-    -- Settings Tab
-    yOffset = 0
-    local unloadButton = Instance.new("TextButton")
-    unloadButton.Name = "UnloadButton"
-    unloadButton.Parent = SettingsTab
-    unloadButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
-    unloadButton.BorderSizePixel = 0
-    unloadButton.Size = UDim2.new(1, -20, 0, 50)
-    unloadButton.LayoutOrder = yOffset
-    unloadButton.Font = Enum.Font.GothamBold
-    unloadButton.Text = "Unload DeX"
-    unloadButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    unloadButton.TextSize = 16
-
-    local UnloadCorner = Instance.new("UICorner")
-    UnloadCorner.CornerRadius = UDim.new(0, 8)
-    UnloadCorner.Parent = unloadButton
-
-    unloadButton.MouseButton1Click:Connect(function()
-        for _, connection in pairs(connections) do
-            if connection then
-                connection:Disconnect()
-            end
-        end
-        
-        for _, connection in pairs(keybindConnections) do
-            if connection then
-                connection:Disconnect()
-            end
-        end
-        
-        if fovcircle then
-            fovcircle:Remove()
-        end
-        
-        clearAllChams()
-        clearESP()
-        
-        if DeXState.nebulaEnabled then
-            for _, effectName in pairs({"NebulaBloom", "NebulaColorCorrection", "NebulaAtmosphere"}) do
-                local effect = Lighting:FindFirstChild(effectName)
-                if effect then
-                    effect:Destroy()
-                end
-            end
-            Lighting.Ambient = Color3.new(0, 0, 0)
-            Lighting.OutdoorAmbient = Color3.new(0, 0, 0)
-            Lighting.FogStart = 0
-            Lighting.FogEnd = 1000
-            Lighting.FogColor = Color3.new(1, 1, 1)
-        end
-        
-        for _, s in pairs(soundPool) do
-            s:Stop()
-            s:Destroy()
-        end
-        
-        setWalkSpeed(getgenv().originalWalkSpeed or 16)
-        if flyBodyVelocity then
-            flyBodyVelocity:Destroy()
-            flyBodyVelocity = nil
-        end
-        if flyBodyGyro then
-            flyBodyGyro:Destroy()
-            flyBodyGyro = nil
-        end
-        
-        ScreenGui:Destroy()
-        print("DeX unloaded successfully!")
-    end)
-
-    -- Dragging functionality
-    local dragging = false
-    local dragStart = nil
-    local startPos = nil
-
-    TitleBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = MainFrame.Position
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = false
-        end
-    end)
-
-    CloseButton.MouseButton1Click:Connect(function()
-        MainFrame.Visible = false
-    end)
-
-    UserInputService.InputBegan:Connect(function(input, gameProcessed)
-        if not gameProcessed and input.KeyCode == DeXState.menuKeybind then
-            MainFrame.Visible = not MainFrame.Visible
-        end
-    end)
-
-    return ScreenGui
+	if CoreGui:FindFirstChild("DeXModernUI") then
+		CoreGui:FindFirstChild("DeXModernUI"):Destroy();
+	end
+	local ScreenGui = Instance.new("ScreenGui");
+	ScreenGui.Name = "DeXModernUI";
+	ScreenGui.Parent = CoreGui;
+	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+	local MainFrame = Instance.new("Frame");
+	MainFrame.Name = "MainFrame";
+	MainFrame.Parent = ScreenGui;
+	MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25);
+	MainFrame.BorderSizePixel = 0;
+	MainFrame.Position = UDim2.new(0.5, -400, 0.5, -350);
+	MainFrame.Size = UDim2.new(0, 800, 0, 700);
+	MainFrame.ClipsDescendants = true;
+	local MainCorner = Instance.new("UICorner");
+	MainCorner.CornerRadius = UDim.new(0, 12);
+	MainCorner.Parent = MainFrame;
+	local Gradient = Instance.new("UIGradient");
+	Gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 30)),ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))});
+	Gradient.Rotation = 45;
+	Gradient.Parent = MainFrame;
+	local TitleBar = Instance.new("Frame");
+	TitleBar.Name = "TitleBar";
+	TitleBar.Parent = MainFrame;
+	TitleBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40);
+	TitleBar.BorderSizePixel = 0;
+	TitleBar.Size = UDim2.new(1, 0, 0, 40);
+	local TitleCorner = Instance.new("UICorner");
+	TitleCorner.CornerRadius = UDim.new(0, 12);
+	TitleCorner.Parent = TitleBar;
+	local Title = Instance.new("TextLabel");
+	Title.Name = "Title";
+	Title.Parent = TitleBar;
+	Title.BackgroundTransparency = 1;
+	Title.Position = UDim2.new(0, 15, 0, 0);
+	Title.Size = UDim2.new(1, -60, 1, 0);
+	Title.Font = Enum.Font.GothamBold;
+	Title.Text = "DeX DaHood - Version 0.0.1";
+	Title.TextColor3 = Color3.fromRGB(255, 255, 255);
+	Title.TextSize = 18;
+	Title.TextXAlignment = Enum.TextXAlignment.Left;
+	local CloseButton = Instance.new("TextButton");
+	CloseButton.Name = "CloseButton";
+	CloseButton.Parent = TitleBar;
+	CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60);
+	CloseButton.BorderSizePixel = 0;
+	CloseButton.Position = UDim2.new(1, -35, 0, 5);
+	CloseButton.Size = UDim2.new(0, 30, 0, 30);
+	CloseButton.Font = Enum.Font.GothamBold;
+	CloseButton.Text = "×";
+	CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255);
+	CloseButton.TextSize = 18;
+	local CloseCorner = Instance.new("UICorner");
+	CloseCorner.CornerRadius = UDim.new(0, 8);
+	CloseCorner.Parent = CloseButton;
+	local TabContainer = Instance.new("Frame");
+	TabContainer.Name = "TabContainer";
+	TabContainer.Parent = MainFrame;
+	TabContainer.BackgroundTransparency = 1;
+	TabContainer.Position = UDim2.new(0, 0, 0, 40);
+	TabContainer.Size = UDim2.new(1, 0, 0, 50);
+	local ContentContainer = Instance.new("Frame");
+	ContentContainer.Name = "ContentContainer";
+	ContentContainer.Parent = MainFrame;
+	ContentContainer.BackgroundTransparency = 1;
+	ContentContainer.Position = UDim2.new(0, 10, 0, 90);
+	ContentContainer.Size = UDim2.new(1, -20, 1, -100);
+	ContentContainer.ClipsDescendants = true;
+	local tabs = {};
+	local currentTab = nil;
+	local function createTab(name, isDefault)
+		local TabButton = Instance.new("TextButton");
+		TabButton.Name = name .. "Tab";
+		TabButton.Parent = TabContainer;
+		TabButton.BackgroundColor3 = (isDefault and Color3.fromRGB(70, 130, 255)) or Color3.fromRGB(50, 50, 50);
+		TabButton.BorderSizePixel = 0;
+		TabButton.Size = UDim2.new(0, 120, 0, 35);
+		TabButton.Font = Enum.Font.Gotham;
+		TabButton.Text = name;
+		TabButton.TextColor3 = Color3.fromRGB(255, 255, 255);
+		TabButton.TextSize = 14;
+		local TabCorner = Instance.new("UICorner");
+		TabCorner.CornerRadius = UDim.new(0, 8);
+		TabCorner.Parent = TabButton;
+		local TabContent = Instance.new("ScrollingFrame");
+		TabContent.Name = name .. "Content";
+		TabContent.Parent = ContentContainer;
+		TabContent.BackgroundTransparency = 1;
+		TabContent.Size = UDim2.new(1, 0, 1, 0);
+		TabContent.ScrollBarThickness = 6;
+		TabContent.ScrollBarImageColor3 = Color3.fromRGB(70, 130, 255);
+		TabContent.Visible = isDefault or false;
+		TabContent.CanvasSize = UDim2.new(0, 0, 0, 0);
+		TabContent.AutomaticCanvasSize = Enum.AutomaticSize.Y;
+		local UIListLayout = Instance.new("UIListLayout");
+		UIListLayout.Parent = TabContent;
+		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder;
+		UIListLayout.Padding = UDim.new(0, 5);
+		tabs[name] = {button=TabButton,content=TabContent};
+		if isDefault then
+			currentTab = name;
+		end
+		TabButton.MouseButton1Click:Connect(function()
+			for tabName, tab in pairs(tabs) do
+				local isActive = tabName == name;
+				tab.content.Visible = isActive;
+				tab.button.BackgroundColor3 = (isActive and Color3.fromRGB(70, 130, 255)) or Color3.fromRGB(50, 50, 50);
+			end
+			currentTab = name;
+		end);
+		return TabContent;
+	end
+	local AimTab = createTab("Aim", true);
+	local VisualsTab = createTab("Visuals", false);
+	local MovementTab = createTab("Movement", false);
+	local SettingsTab = createTab("Settings", false);
+	local KeybindsTab = createTab("Keybinds", false);
+	local tabIndex = 0;
+	for tabName, tab in pairs(tabs) do
+		tab.button.Position = UDim2.new(0, 10 + (tabIndex * 130), 0, 7.5);
+		tabIndex = tabIndex + 1;
+	end
+	local yOffset = 0;
+	local function createToggle(parent, text, default, callback)
+		local ToggleFrame = Instance.new("Frame");
+		ToggleFrame.Name = text .. "Toggle";
+		ToggleFrame.Parent = parent;
+		ToggleFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35);
+		ToggleFrame.BorderSizePixel = 0;
+		ToggleFrame.Size = UDim2.new(1, -20, 0, 40);
+		ToggleFrame.LayoutOrder = yOffset;
+		local ToggleCorner = Instance.new("UICorner");
+		ToggleCorner.CornerRadius = UDim.new(0, 8);
+		ToggleCorner.Parent = ToggleFrame;
+		local ToggleLabel = Instance.new("TextLabel");
+		ToggleLabel.Parent = ToggleFrame;
+		ToggleLabel.BackgroundTransparency = 1;
+		ToggleLabel.Position = UDim2.new(0, 15, 0, 0);
+		ToggleLabel.Size = UDim2.new(1, -60, 1, 0);
+		ToggleLabel.Font = Enum.Font.Gotham;
+		ToggleLabel.Text = text;
+		ToggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+		ToggleLabel.TextSize = 14;
+		ToggleLabel.TextXAlignment = Enum.TextXAlignment.Left;
+		local ToggleButton = Instance.new("TextButton");
+		ToggleButton.Parent = ToggleFrame;
+		ToggleButton.BackgroundColor3 = (default and Color3.fromRGB(70, 130, 255)) or Color3.fromRGB(60, 60, 60);
+		ToggleButton.BorderSizePixel = 0;
+		ToggleButton.Position = UDim2.new(1, -40, 0, 10);
+		ToggleButton.Size = UDim2.new(0, 30, 0, 20);
+		ToggleButton.Text = "";
+		local ButtonCorner = Instance.new("UICorner");
+		ButtonCorner.CornerRadius = UDim.new(0, 10);
+		ButtonCorner.Parent = ToggleButton;
+		local isEnabled = default;
+		ToggleButton.MouseButton1Click:Connect(function()
+			isEnabled = not isEnabled;
+			ToggleButton.BackgroundColor3 = (isEnabled and Color3.fromRGB(70, 130, 255)) or Color3.fromRGB(60, 60, 60);
+			if callback then
+				callback(isEnabled);
+			end
+		end);
+		yOffset = yOffset + 1;
+		return {frame=ToggleFrame,getValue=function()
+			return isEnabled;
+		end,setValue=function(val)
+			isEnabled = val;
+			ToggleButton.BackgroundColor3 = (isEnabled and Color3.fromRGB(70, 130, 255)) or Color3.fromRGB(60, 60, 60);
+		end};
+	end
+	local function createSlider(parent, text, min, max, default, callback)
+		local SliderFrame = Instance.new("Frame");
+		SliderFrame.Name = text .. "Slider";
+		SliderFrame.Parent = parent;
+		SliderFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35);
+		SliderFrame.BorderSizePixel = 0;
+		SliderFrame.Size = UDim2.new(1, -20, 0, 60);
+		SliderFrame.LayoutOrder = yOffset;
+		local SliderCorner = Instance.new("UICorner");
+		SliderCorner.CornerRadius = UDim.new(0, 8);
+		SliderCorner.Parent = SliderFrame;
+		local SliderLabel = Instance.new("TextLabel");
+		SliderLabel.Parent = SliderFrame;
+		SliderLabel.BackgroundTransparency = 1;
+		SliderLabel.Position = UDim2.new(0, 15, 0, 5);
+		SliderLabel.Size = UDim2.new(1, -30, 0, 20);
+		SliderLabel.Font = Enum.Font.Gotham;
+		SliderLabel.Text = text .. ": " .. tostring(default);
+		SliderLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+		SliderLabel.TextSize = 14;
+		SliderLabel.TextXAlignment = Enum.TextXAlignment.Left;
+		local SliderBar = Instance.new("Frame");
+		SliderBar.Parent = SliderFrame;
+		SliderBar.BackgroundColor3 = Color3.fromRGB(60, 60, 60);
+		SliderBar.BorderSizePixel = 0;
+		SliderBar.Position = UDim2.new(0, 15, 0, 35);
+		SliderBar.Size = UDim2.new(1, -30, 0, 6);
+		local BarCorner = Instance.new("UICorner");
+		BarCorner.CornerRadius = UDim.new(0, 3);
+		BarCorner.Parent = SliderBar;
+		local SliderFill = Instance.new("Frame");
+		SliderFill.Parent = SliderBar;
+		SliderFill.BackgroundColor3 = Color3.fromRGB(70, 130, 255);
+		SliderFill.BorderSizePixel = 0;
+		SliderFill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0);
+		local FillCorner = Instance.new("UICorner");
+		FillCorner.CornerRadius = UDim.new(0, 3);
+		FillCorner.Parent = SliderFill;
+		local SliderButton = Instance.new("TextButton");
+		SliderButton.Parent = SliderBar;
+		SliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+		SliderButton.BorderSizePixel = 0;
+		SliderButton.Position = UDim2.new((default - min) / (max - min), -8, 0, -6);
+		SliderButton.Size = UDim2.new(0, 16, 0, 18);
+		SliderButton.Text = "";
+		local ButtonCorner = Instance.new("UICorner");
+		ButtonCorner.CornerRadius = UDim.new(0, 8);
+		ButtonCorner.Parent = SliderButton;
+		local currentValue = default;
+		local dragging = false;
+		local function updateSlider()
+			SliderLabel.Text = text .. ": " .. tostring(math.floor(currentValue * 100) / 100);
+			local percentage = (currentValue - min) / (max - min);
+			SliderFill.Size = UDim2.new(percentage, 0, 1, 0);
+			SliderButton.Position = UDim2.new(percentage, -8, 0, -6);
+			if callback then
+				callback(currentValue);
+			end
+		end
+		SliderButton.MouseButton1Down:Connect(function()
+			dragging = true;
+		end);
+		local connection;
+		connection = UserInputService.InputEnded:Connect(function(input)
+			if (input.UserInputType == Enum.UserInputType.MouseButton1) then
+				dragging = false;
+			end
+		end);
+		local connection2;
+		connection2 = UserInputService.InputChanged:Connect(function(input)
+			if (dragging and (input.UserInputType == Enum.UserInputType.MouseMovement)) then
+				local mousePos = UserInputService:GetMouseLocation();
+				local sliderPos = SliderBar.AbsolutePosition.X;
+				local sliderSize = SliderBar.AbsoluteSize.X;
+				local percentage = math.clamp((mousePos.X - sliderPos) / sliderSize, 0, 1);
+				currentValue = min + (percentage * (max - min));
+				updateSlider();
+			end
+		end);
+		yOffset = yOffset + 1;
+		return {frame=SliderFrame,getValue=function()
+			return currentValue;
+		end,destroy=function()
+			if connection then
+				connection:Disconnect();
+			end
+			if connection2 then
+				connection2:Disconnect();
+			end
+		end};
+	end
+	local function createDropdown(parent, text, options, default, callback)
+		local DropdownFrame = Instance.new("Frame");
+		DropdownFrame.Name = text .. "Dropdown";
+		DropdownFrame.Parent = parent;
+		DropdownFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35);
+		DropdownFrame.BorderSizePixel = 0;
+		DropdownFrame.Size = UDim2.new(1, -20, 0, 40);
+		DropdownFrame.LayoutOrder = yOffset;
+		DropdownFrame.ClipsDescendants = true;
+		local DropdownCorner = Instance.new("UICorner");
+		DropdownCorner.CornerRadius = UDim.new(0, 8);
+		DropdownCorner.Parent = DropdownFrame;
+		local DropdownButton = Instance.new("TextButton");
+		DropdownButton.Parent = DropdownFrame;
+		DropdownButton.BackgroundTransparency = 1;
+		DropdownButton.Size = UDim2.new(1, 0, 1, 0);
+		DropdownButton.Font = Enum.Font.Gotham;
+		DropdownButton.Text = text .. ": " .. (default or options[1] or "None");
+		DropdownButton.TextColor3 = Color3.fromRGB(255, 255, 255);
+		DropdownButton.TextSize = 14;
+		local currentValue = default or options[1];
+		local isOpen = false;
+		DropdownButton.MouseButton1Click:Connect(function()
+			isOpen = not isOpen;
+			if isOpen then
+				DropdownFrame.Size = UDim2.new(1, -20, 0, 40 + (#options * 30));
+				for i, option in ipairs(options) do
+					local OptionButton = Instance.new("TextButton");
+					OptionButton.Name = "Option" .. i;
+					OptionButton.Parent = DropdownFrame;
+					OptionButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45);
+					OptionButton.BorderSizePixel = 0;
+					OptionButton.Position = UDim2.new(0, 0, 0, 40 + ((i - 1) * 30));
+					OptionButton.Size = UDim2.new(1, 0, 0, 30);
+					OptionButton.Font = Enum.Font.Gotham;
+					OptionButton.Text = option;
+					OptionButton.TextColor3 = Color3.fromRGB(200, 200, 200);
+					OptionButton.TextSize = 12;
+					OptionButton.MouseButton1Click:Connect(function()
+						currentValue = option;
+						DropdownButton.Text = text .. ": " .. option;
+						if callback then
+							callback(option);
+						end
+						for j = 1, #options do
+							local opt = DropdownFrame:FindFirstChild("Option" .. j);
+							if opt then
+								opt:Destroy();
+							end
+						end
+						DropdownFrame.Size = UDim2.new(1, -20, 0, 40);
+						isOpen = false;
+					end);
+				end
+			else
+				for j = 1, #options do
+					local opt = DropdownFrame:FindFirstChild("Option" .. j);
+					if opt then
+						opt:Destroy();
+					end
+				end
+				DropdownFrame.Size = UDim2.new(1, -20, 0, 40);
+			end
+		end);
+		yOffset = yOffset + 1;
+		return {frame=DropdownFrame,getValue=function()
+			return currentValue;
+		end};
+	end
+	local function createKeybind(parent, text, default, callback)
+		local KeybindFrame = Instance.new("Frame");
+		KeybindFrame.Name = text .. "Keybind";
+		KeybindFrame.Parent = parent;
+		KeybindFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35);
+		KeybindFrame.BorderSizePixel = 0;
+		KeybindFrame.Size = UDim2.new(1, -20, 0, 40);
+		KeybindFrame.LayoutOrder = yOffset;
+		local KeybindCorner = Instance.new("UICorner");
+		KeybindCorner.CornerRadius = UDim.new(0, 8);
+		KeybindCorner.Parent = KeybindFrame;
+		local KeybindLabel = Instance.new("TextLabel");
+		KeybindLabel.Parent = KeybindFrame;
+		KeybindLabel.BackgroundTransparency = 1;
+		KeybindLabel.Position = UDim2.new(0, 15, 0, 0);
+		KeybindLabel.Size = UDim2.new(1, -120, 1, 0);
+		KeybindLabel.Font = Enum.Font.Gotham;
+		KeybindLabel.Text = text;
+		KeybindLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+		KeybindLabel.TextSize = 14;
+		KeybindLabel.TextXAlignment = Enum.TextXAlignment.Left;
+		local KeybindButton = Instance.new("TextButton");
+		KeybindButton.Parent = KeybindFrame;
+		KeybindButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60);
+		KeybindButton.BorderSizePixel = 0;
+		KeybindButton.Position = UDim2.new(1, -100, 0, 5);
+		KeybindButton.Size = UDim2.new(0, 90, 0, 30);
+		KeybindButton.Font = Enum.Font.Gotham;
+		KeybindButton.Text = default.Name;
+		KeybindButton.TextColor3 = Color3.fromRGB(255, 255, 255);
+		KeybindButton.TextSize = 12;
+		local ButtonCorner = Instance.new("UICorner");
+		ButtonCorner.CornerRadius = UDim.new(0, 6);
+		ButtonCorner.Parent = KeybindButton;
+		local currentKey = default;
+		local isBinding = false;
+		KeybindButton.MouseButton1Click:Connect(function()
+			if isBinding then
+				return;
+			end
+			isBinding = true;
+			KeybindButton.Text = "Press Key...";
+			KeybindButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
+			local connection;
+			connection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+				if (input.UserInputType == Enum.UserInputType.Keyboard) then
+					currentKey = input.KeyCode;
+					KeybindButton.Text = input.KeyCode.Name;
+					KeybindButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60);
+					isBinding = false;
+					connection:Disconnect();
+					if callback then
+						callback(currentKey);
+					end
+				end
+			end);
+		end);
+		yOffset = yOffset + 1;
+		return {frame=KeybindFrame,getValue=function()
+			return currentKey;
+		end};
+	end
+	local function createColorPicker(parent, text, default, callback)
+		local ColorFrame = Instance.new("Frame");
+		ColorFrame.Name = text .. "ColorPicker";
+		ColorFrame.Parent = parent;
+		ColorFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35);
+		ColorFrame.BorderSizePixel = 0;
+		ColorFrame.Size = UDim2.new(1, -20, 0, 40);
+		ColorFrame.LayoutOrder = yOffset;
+		local ColorCorner = Instance.new("UICorner");
+		ColorCorner.CornerRadius = UDim.new(0, 8);
+		ColorCorner.Parent = ColorFrame;
+		local ColorLabel = Instance.new("TextLabel");
+		ColorLabel.Parent = ColorFrame;
+		ColorLabel.BackgroundTransparency = 1;
+		ColorLabel.Position = UDim2.new(0, 15, 0, 0);
+		ColorLabel.Size = UDim2.new(1, -60, 1, 0);
+		ColorLabel.Font = Enum.Font.Gotham;
+		ColorLabel.Text = text;
+		ColorLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+		ColorLabel.TextSize = 14;
+		ColorLabel.TextXAlignment = Enum.TextXAlignment.Left;
+		local ColorButton = Instance.new("TextButton");
+		ColorButton.Parent = ColorFrame;
+		ColorButton.BackgroundColor3 = default;
+		ColorButton.BorderSizePixel = 0;
+		ColorButton.Position = UDim2.new(1, -40, 0, 10);
+		ColorButton.Size = UDim2.new(0, 30, 0, 20);
+		ColorButton.Text = "";
+		local ButtonCorner = Instance.new("UICorner");
+		ButtonCorner.CornerRadius = UDim.new(0, 4);
+		ButtonCorner.Parent = ColorButton;
+		local currentColor = default;
+		ColorButton.MouseButton1Click:Connect(function()
+			local colors = {Color3.fromRGB(255, 255, 255),Color3.fromRGB(255, 0, 0),Color3.fromRGB(0, 255, 0),Color3.fromRGB(0, 0, 255),Color3.fromRGB(255, 255, 0),Color3.fromRGB(255, 0, 255),Color3.fromRGB(0, 255, 255)};
+			for i, color in ipairs(colors) do
+				if (currentColor == color) then
+					currentColor = colors[i + 1] or colors[1];
+					break;
+				elseif (i == #colors) then
+					currentColor = colors[1];
+				end
+			end
+			ColorButton.BackgroundColor3 = currentColor;
+			if callback then
+				callback(currentColor);
+			end
+		end);
+		yOffset = yOffset + 1;
+		return {frame=ColorFrame,getValue=function()
+			return currentColor;
+		end};
+	end
+	yOffset = 0;
+	createToggle(AimTab, "Master Toggle", true, function(val)
+		DeXState.masterToggle = val;
+	end);
+	createToggle(AimTab, "Enable AimLock", false, function(val)
+		DeXState.aimLockEnabled = val;
+		if not val then
+			DeXState.lockEnabled = false;
+			DeXState.isLockedOn = false;
+			DeXState.targetPlayer = nil;
+		end
+	end);
+	createToggle(AimTab, "AimLock Keybind", false, function(val)
+		DeXState.lockEnabled = val;
+		if not val then
+			DeXState.isLockedOn = false;
+			DeXState.targetPlayer = nil;
+		end
+	end);
+	createSlider(AimTab, "Camera Smoothing", 0, 1, 0.1, function(val)
+		DeXState.smoothingFactor = val;
+	end);
+	createSlider(AimTab, "Prediction Factor", 0, 2, 0, function(val)
+		DeXState.predictionFactor = val;
+	end);
+	createSlider(AimTab, "Locked Time", 1, 30, 12, function(val)
+		DeXState.lockedTime = val;
+	end);
+	createDropdown(AimTab, "Target Body Part", {"Head","UpperTorso","RightUpperArm","LeftUpperLeg","RightUpperLeg","LeftUpperArm"}, "Head", function(val)
+		DeXState.bodyPartSelected = val;
+	end);
+	createToggle(AimTab, "Anti-Lock", false, function(val)
+		DeXState.antiLockEnabled = val;
+	end);
+	createSlider(AimTab, "Resolver Intensity", 0.1, 3, 1, function(val)
+		DeXState.resolverIntensity = val;
+	end);
+	createSlider(AimTab, "Reverse Resolve Intensity", 1, 10, 5, function(val)
+		DeXState.reverseResolveIntensity = val;
+	end);
+	createDropdown(AimTab, "Resolver Method", {"Recalculate","Randomize","Invert"}, "Recalculate", function(val)
+		DeXState.resolverMethod = val;
+	end);
+	createToggle(AimTab, "Desync", false, function(val)
+		DeXState.Desync = val;
+	end);
+	createToggle(AimTab, "Desync Enabled", false, function(val)
+		DeXState.DesyncEnabled = val;
+	end);
+	createToggle(AimTab, "Silent Aim", false, function(val)
+		DeXState.silentAimEnabled = val;
+		SilentAimSettings.Enabled = val;
+	end);
+	createToggle(AimTab, "Team Check", false, function(val)
+		DeXState.teamCheck = val;
+		SilentAimSettings.TeamCheck = val;
+	end);
+	createToggle(AimTab, "Bullet Teleport", false, function(val)
+		DeXState.bulletTeleport = val;
+		SilentAimSettings.BulletTP = val;
+	end);
+	createDropdown(AimTab, "Silent Target Part", {"Head","HumanoidRootPart","UpperTorso"}, "HumanoidRootPart", function(val)
+		DeXState.targetPart = val;
+		SilentAimSettings.TargetPart = val;
+	end);
+	createDropdown(AimTab, "Silent Aim Method", {"Raycast","FindPartOnRay","ViewportPointToRay","ScreenPointToRay"}, "Raycast", function(val)
+		DeXState.silentAimMethod = val;
+		SilentAimSettings.SilentAimMethod = val;
+	end);
+	createSlider(AimTab, "Hit Chance %", 0, 100, 100, function(val)
+		DeXState.hitChance = val;
+		SilentAimSettings.HitChance = val;
+	end);
+	yOffset = 0;
+	createToggle(VisualsTab, "Show FOV Circle", false, function(val)
+		DeXState.fovEnabled = val;
+		fovcircle.Visible = val;
+		SilentAimSettings.FOVVisible = val;
+	end);
+	createSlider(VisualsTab, "FOV Circle Radius", 0, 360, 130, function(val)
+		DeXState.fovValue = val;
+		fovcircle.Radius = val;
+		SilentAimSettings.FOVRadius = val;
+	end);
+	createToggle(VisualsTab, "Enable ESP", false, function(val)
+		DeXState.espEnabled = val;
+		if not val then
+			clearESP();
+		else
+			for _, player in pairs(Players:GetPlayers()) do
+				if (player ~= Players.LocalPlayer) then
+					createESP(player);
+				end
+			end
+		end
+	end);
+	createToggle(VisualsTab, "ESP Team Check", false, function(val)
+		DeXState.espTeamCheck = val;
+	end);
+	createToggle(VisualsTab, "ESP Name Tag", false, function(val)
+		DeXState.espNameTag = val;
+	end);
+	createToggle(VisualsTab, "ESP Box", false, function(val)
+		DeXState.espBox = val;
+	end);
+	createToggle(VisualsTab, "ESP Health Bar", false, function(val)
+		DeXState.espHealthBar = val;
+	end);
+	createToggle(VisualsTab, "ESP Tracer", false, function(val)
+		DeXState.espTracer = val;
+	end);
+	createToggle(VisualsTab, "Self Chams", false, function(val)
+		DeXState.SelfChamsEnabled = val;
+		if val then
+			if Players.LocalPlayer.Character then
+				applyChams(Players.LocalPlayer.Character, true);
+			end
+		else
+			removeChams(Players.LocalPlayer.Character);
+		end
+	end);
+	createToggle(VisualsTab, "Other Player Chams", false, function(val)
+		DeXState.OtherChamsEnabled = val;
+		if val then
+			for _, player in pairs(Players:GetPlayers()) do
+				if ((player ~= Players.LocalPlayer) and player.Character) then
+					applyChams(player.Character, false);
+				end
+			end
+		else
+			for _, player in pairs(Players:GetPlayers()) do
+				if ((player ~= Players.LocalPlayer) and player.Character) then
+					removeChams(player.Character);
+				end
+			end
+		end
+	end);
+	createToggle(VisualsTab, "Rainbow Chams", false, function(val)
+		DeXState.RainbowChamsEnabled = val;
+	end);
+	createColorPicker(VisualsTab, "Self Chams Color", Color3.fromRGB(255, 255, 255), function(val)
+		DeXState.SelfChamsColor = val;
+		if (DeXState.SelfChamsEnabled and Players.LocalPlayer.Character) then
+			removeChams(Players.LocalPlayer.Character);
+			applyChams(Players.LocalPlayer.Character, true);
+		end
+	end);
+	createColorPicker(VisualsTab, "Other Chams Color", Color3.fromRGB(255, 0, 0), function(val)
+		DeXState.OtherChamsColor = val;
+		if DeXState.OtherChamsEnabled then
+			for _, player in pairs(Players:GetPlayers()) do
+				if ((player ~= Players.LocalPlayer) and player.Character) then
+					removeChams(player.Character);
+					applyChams(player.Character, false);
+				end
+			end
+		end
+	end);
+	createToggle(VisualsTab, "Nebula Theme", false, function(val)
+		DeXState.nebulaEnabled = val;
+		if val then
+			local b = Instance.new("BloomEffect", Lighting);
+			b.Name = "NebulaBloom";
+			b.Intensity = 0.7;
+			b.Size = 24;
+			b.Threshold = 1;
+			local c = Instance.new("ColorCorrectionEffect", Lighting);
+			c.Name = "NebulaColorCorrection";
+			c.Saturation = 0.5;
+			c.Contrast = 0.2;
+			c.TintColor = Color3.fromRGB(173, 216, 230);
+			local a = Instance.new("Atmosphere", Lighting);
+			a.Name = "NebulaAtmosphere";
+			a.Density = 0.4;
+			a.Offset = 0.25;
+			a.Glare = 1;
+			a.Haze = 2;
+			a.Color = Color3.fromRGB(25, 25, 112);
+			a.Decay = 1;
+			Lighting.Aambient = Color3.fromRGB(173, 216, 230);
+			Lighting.OutdoorAmbient = Color3.fromRGB(173, 216, 230);
+			Lighting.FogStart = 100;
+			Lighting.FogEnd = 500;
+			Lighting.FogColor = Color3.fromRGB(173, 216, 230);
+		else
+			for _, effectName in pairs({"NebulaBloom","NebulaColorCorrection","NebulaAtmosphere"}) do
+				local effect = Lighting:FindFirstChild(effectName);
+				if effect then
+					effect:Destroy();
+				end
+			end
+			Lighting.Ambient = Color3.new(0, 0, 0);
+			Lighting.OutdoorAmbient = Color3.new(0, 0, 0);
+			Lighting.FogStart = 0;
+			Lighting.FogEnd = 1000;
+			Lighting.FogColor = Color3.new(1, 1, 1);
+		end
+	end);
+	createToggle(VisualsTab, "Hit Sound", false, function(val)
+		DeXState.hitSoundEnabled = val;
+	end);
+	createDropdown(VisualsTab, "Hit Sound", {"Neverlose","Bameware","Cod","Minecraft","Bubble","RIFK7","Gamesense","Rust"}, "Neverlose", function(val)
+		if sounds[val] then
+			DeXState.hitSoundId = sounds[val];
+			hitSound.SoundId = sounds[val];
+		end
+	end);
+	yOffset = 0;
+	createToggle(MovementTab, "Speed", false, function(val)
+		DeXState.isSpeedActive = val;
+		setWalkSpeed((val and DeXState.flySpeed) or getgenv().originalWalkSpeed or 16);
+	end);
+	createSlider(MovementTab, "Speed Multiplier", 1, 100, 50, function(val)
+		DeXState.flySpeed = val;
+		if DeXState.isSpeedActive then
+			setWalkSpeed(val);
+		end
+	end);
+	createToggle(MovementTab, "Fly", false, function(val)
+		DeXState.isFlyActive = val;
+		if not val then
+			if flyBodyVelocity then
+				flyBodyVelocity:Destroy();
+				flyBodyVelocity = nil;
+			end
+			if flyBodyGyro then
+				flyBodyGyro:Destroy();
+				flyBodyGyro = nil;
+			end
+		end
+	end);
+	createToggle(MovementTab, "NoClip", false, function(val)
+		DeXState.isNoClipActive = val;
+	end);
+	createToggle(MovementTab, "Target Strafe", false, function(val)
+		DeXState.strafeEnabled = val;
+	end);
+	createSlider(MovementTab, "Strafe Speed", 10, 100, 50, function(val)
+		DeXState.strafeSpeed = val;
+	end);
+	createSlider(MovementTab, "Strafe Radius", 1, 20, 5, function(val)
+		DeXState.strafeRadius = val;
+	end);
+	createDropdown(MovementTab, "Strafe Mode", {"Horizontal","Vertical","Random"}, "Horizontal", function(val)
+		DeXState.strafeMode = val;
+	end);
+	yOffset = 0;
+	createKeybind(KeybindsTab, "AimLock Keybind", DeXState.aimLockKeybind, function(key)
+		DeXState.aimLockKeybind = key;
+		setupKeybinds();
+	end);
+	createKeybind(KeybindsTab, "Menu Toggle", DeXState.menuKeybind, function(key)
+		DeXState.menuKeybind = key;
+	end);
+	createKeybind(KeybindsTab, "Fly Toggle", DeXState.flyKeybind, function(key)
+		DeXState.flyKeybind = key;
+		setupKeybinds();
+	end);
+	createKeybind(KeybindsTab, "Speed Toggle", DeXState.speedKeybind, function(key)
+		DeXState.speedKeybind = key;
+		setupKeybinds();
+	end);
+	createKeybind(KeybindsTab, "NoClip Toggle", DeXState.noclipKeybind, function(key)
+		DeXState.noclipKeybind = key;
+		setupKeybinds();
+	end);
+	createKeybind(KeybindsTab, "Strafe Toggle", DeXState.strafeKeybind, function(key)
+		DeXState.strafeKeybind = key;
+		setupKeybinds();
+	end);
+	yOffset = 0;
+	local unloadButton = Instance.new("TextButton");
+	unloadButton.Name = "UnloadButton";
+	unloadButton.Parent = SettingsTab;
+	unloadButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60);
+	unloadButton.BorderSizePixel = 0;
+	unloadButton.Size = UDim2.new(1, -20, 0, 50);
+	unloadButton.LayoutOrder = yOffset;
+	unloadButton.Font = Enum.Font.GothamBold;
+	unloadButton.Text = "Unload DeX";
+	unloadButton.TextColor3 = Color3.fromRGB(255, 255, 255);
+	unloadButton.TextSize = 16;
+	local UnloadCorner = Instance.new("UICorner");
+	UnloadCorner.CornerRadius = UDim.new(0, 8);
+	UnloadCorner.Parent = unloadButton;
+	unloadButton.MouseButton1Click:Connect(function()
+		for _, connection in pairs(connections) do
+			if connection then
+				connection:Disconnect();
+			end
+		end
+		for _, connection in pairs(keybindConnections) do
+			if connection then
+				connection:Disconnect();
+			end
+		end
+		if fovcircle then
+			fovcircle:Remove();
+		end
+		clearAllChams();
+		clearESP();
+		if DeXState.nebulaEnabled then
+			for _, effectName in pairs({"NebulaBloom","NebulaColorCorrection","NebulaAtmosphere"}) do
+				local effect = Lighting:FindFirstChild(effectName);
+				if effect then
+					effect:Destroy();
+				end
+			end
+			Lighting.Ambient = Color3.new(0, 0, 0);
+			Lighting.OutdoorAmbient = Color3.new(0, 0, 0);
+			Lighting.FogStart = 0;
+			Lighting.FogEnd = 1000;
+			Lighting.FogColor = Color3.new(1, 1, 1);
+		end
+		for _, s in pairs(soundPool) do
+			s:Stop();
+			s:Destroy();
+		end
+		setWalkSpeed(getgenv().originalWalkSpeed or 16);
+		if flyBodyVelocity then
+			flyBodyVelocity:Destroy();
+			flyBodyVelocity = nil;
+		end
+		if flyBodyGyro then
+			flyBodyGyro:Destroy();
+			flyBodyGyro = nil;
+		end
+		ScreenGui:Destroy();
+		print("DeX unloaded successfully!");
+	end);
+	local dragging = false;
+	local dragStart = nil;
+	local startPos = nil;
+	TitleBar.InputBegan:Connect(function(input)
+		if (input.UserInputType == Enum.UserInputType.MouseButton1) then
+			dragging = true;
+			dragStart = input.Position;
+			startPos = MainFrame.Position;
+		end
+	end);
+	UserInputService.InputChanged:Connect(function(input)
+		if (dragging and (input.UserInputType == Enum.UserInputType.MouseMovement)) then
+			local delta = input.Position - dragStart;
+			MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y);
+		end
+	end);
+	UserInputService.InputEnded:Connect(function(input)
+		if (input.UserInputType == Enum.UserInputType.MouseButton1) then
+			dragging = false;
+		end
+	end);
+	CloseButton.MouseButton1Click:Connect(function()
+		MainFrame.Visible = false;
+	end);
+	UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if (not gameProcessed and (input.KeyCode == DeXState.menuKeybind)) then
+			MainFrame.Visible = not MainFrame.Visible;
+		end
+	end);
+	return ScreenGui;
 end
-
 local function setupSilentAim()
-    local mt = getrawmetatable(game)
-    local oldNamecall
-
-    if hookmetamethod then  
-        oldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)  
-            local method = getnamecallmethod()  
-            local args = {...}  
-              
-            if SilentAimSettings.Enabled and self == workspace and method then  
-                if method == "FindPartOnRay" or method == "Raycast" then  
-                    if not CalculateChancePercentage(SilentAimSettings.HitChance) then  
-                        return oldNamecall(self, unpack(args))  
-                    end
-
-                    local targetPart = getClosestPlayerForSilentAim()  
-                    if targetPart then  
-                        local origin  
-                        if SilentAimSettings.BulletTP then  
-                            origin = targetPart.CFrame.Position + Vector3.new(0, 0, 1)  
-                        else  
-                            origin = Camera.CFrame.Position  
-                        end  
-                        local direction = (targetPart.Position - origin).Unit * 1000
-
-                        if method == "FindPartOnRay" then  
-                            return oldNamecall(self, Ray.new(origin, direction))  
-                        elseif method == "Raycast" then  
-                            local raycastParams = args[1]  
-                            if raycastParams then  
-                                raycastParams.Origin = origin  
-                                raycastParams.Direction = direction  
-                            end  
-                            return oldNamecall(self, raycastParams)  
-                        end  
-                    end  
-                end  
-            end  
-            return oldNamecall(self, unpack(args))  
-        end))  
-    elseif mt and setreadonly then  
-        setreadonly(mt, false)  
-        oldNamecall = mt.__namecall  
-          
-        mt.__namecall = newcclosure(function(self, ...)  
-            local method = getnamecallmethod()  
-            local args = {...}  
-              
-            if SilentAimSettings.Enabled and self == workspace and method then  
-                if method == "FindPartOnRay" or method == "Raycast" then  
-                    if not CalculateChancePercentage(SilentAimSettings.HitChance) then  
-                        return oldNamecall(self, unpack(args))  
-                    end
-
-                    local targetPart = getClosestPlayerForSilentAim()  
-                    if targetPart then  
-                        local origin  
-                        if SilentAimSettings.BulletTP then  
-                            origin = targetPart.CFrame.Position + Vector3.new(0, 0, 1)  
-                        else  
-                            origin = Camera.CFrame.Position  
-                        end  
-                        local direction = (targetPart.Position - origin).Unit * 1000
-
-                        if method == "FindPartOnRay" then  
-                            return oldNamecall(self, Ray.new(origin, direction))  
-                        elseif method == "Raycast" then  
-                            local raycastParams = args[1]  
-                            if raycastParams then  
-                                raycastParams.Origin = origin  
-                                raycastParams.Direction = direction  
-                            end  
-                            return oldNamecall(self, raycastParams)  
-                        end  
-                    end  
-                end  
-            end  
-            return oldNamecall(self, unpack(args))  
-        end)  
-          
-        setreadonly(mt, true)  
-    else  
-        print("Silent Aim: Advanced hooking not available, using basic mode")  
-          
-        connections[#connections + 1] = UserInputService.InputBegan:Connect(function(input, gameProcessed)  
-            if not gameProcessed and input.UserInputType == Enum.UserInputType.MouseButton1 and SilentAimSettings.Enabled then  
-                if CalculateChancePercentage(SilentAimSettings.HitChance) then  
-                    local targetPart = getClosestPlayerForSilentAim()  
-                    if targetPart then  
-                        local originalCFrame = Camera.CFrame  
-                          
-                        Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, targetPart.Position)  
-                          
-                        RunService.Heartbeat:Wait()  
-                        Camera.CFrame = originalCFrame  
-                    end  
-                end  
-            end  
-        end)  
-    end  
+	local mt = getrawmetatable(game);
+	local oldNamecall;
+	if hookmetamethod then
+		oldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+			local method = getnamecallmethod();
+			local args = {...};
+			if (SilentAimSettings.Enabled and (self == workspace) and method) then
+				if ((method == "FindPartOnRay") or (method == "Raycast")) then
+					if not CalculateChancePercentage(SilentAimSettings.HitChance) then
+						return oldNamecall(self, unpack(args));
+					end
+					local targetPart = getClosestPlayerForSilentAim();
+					if targetPart then
+						local origin;
+						if SilentAimSettings.BulletTP then
+							origin = targetPart.CFrame.Position + Vector3.new(0, 0, 1);
+						else
+							origin = Camera.CFrame.Position;
+						end
+						local direction = (targetPart.Position - origin).Unit * 1000;
+						if (method == "FindPartOnRay") then
+							return oldNamecall(self, Ray.new(origin, direction));
+						elseif (method == "Raycast") then
+							local raycastParams = args[1];
+							if raycastParams then
+								raycastParams.Origin = origin;
+								raycastParams.Direction = direction;
+							end
+							return oldNamecall(self, raycastParams);
+						end
+					end
+				end
+			end
+			return oldNamecall(self, unpack(args));
+		end));
+	elseif (mt and setreadonly) then
+		setreadonly(mt, false);
+		oldNamecall = mt.__namecall;
+		mt.__namecall = newcclosure(function(self, ...)
+			local method = getnamecallmethod();
+			local args = {...};
+			if (SilentAimSettings.Enabled and (self == workspace) and method) then
+				if ((method == "FindPartOnRay") or (method == "Raycast")) then
+					if not CalculateChancePercentage(SilentAimSettings.HitChance) then
+						return oldNamecall(self, unpack(args));
+					end
+					local targetPart = getClosestPlayerForSilentAim();
+					if targetPart then
+						local origin;
+						if SilentAimSettings.BulletTP then
+							origin = targetPart.CFrame.Position + Vector3.new(0, 0, 1);
+						else
+							origin = Camera.CFrame.Position;
+						end
+						local direction = (targetPart.Position - origin).Unit * 1000;
+						if (method == "FindPartOnRay") then
+							return oldNamecall(self, Ray.new(origin, direction));
+						elseif (method == "Raycast") then
+							local raycastParams = args[1];
+							if raycastParams then
+								raycastParams.Origin = origin;
+								raycastParams.Direction = direction;
+							end
+							return oldNamecall(self, raycastParams);
+						end
+					end
+				end
+			end
+			return oldNamecall(self, unpack(args));
+		end);
+		setreadonly(mt, true);
+	else
+		print("Silent Aim: Advanced hooking not available, using basic mode");
+		connections[#connections + 1] = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+			if (not gameProcessed and (input.UserInputType == Enum.UserInputType.MouseButton1) and SilentAimSettings.Enabled) then
+				if CalculateChancePercentage(SilentAimSettings.HitChance) then
+					local targetPart = getClosestPlayerForSilentAim();
+					if targetPart then
+						local originalCFrame = Camera.CFrame;
+						Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, targetPart.Position);
+						RunService.Heartbeat:Wait();
+						Camera.CFrame = originalCFrame;
+					end
+				end
+			end
+		end);
+	end
 end
-
 connections[#connections + 1] = RunService.RenderStepped:Connect(function()
-    if not DeXState.masterToggle then return end
-
-    if DeXState.aimLockEnabled and DeXState.lockEnabled and DeXState.isLockedOn and DeXState.targetPlayer and DeXState.targetPlayer.Character then  
-        local partName = DeXState.bodyPartSelected  
-        local part = DeXState.targetPlayer.Character:FindFirstChild(partName)  
-        if part and DeXState.targetPlayer.Character:FindFirstChildOfClass("Humanoid").Health > 0 then  
-            local predictedPosition = part.Position + (part.AssemblyLinearVelocity * DeXState.predictionFactor)  
-              
-            if DeXState.antiLockEnabled then  
-                if DeXState.resolverMethod == "Recalculate" then  
-                    predictedPosition = predictedPosition + part.AssemblyLinearVelocity * DeXState.resolverIntensity  
-                elseif DeXState.resolverMethod == "Randomize" then  
-                    predictedPosition = predictedPosition + Vector3.new(  
-                        (math.random() * 2 - 1) * DeXState.resolverIntensity,  
-                        (math.random() * 2 - 1) * DeXState.resolverIntensity,  
-                        (math.random() * 2 - 1) * DeXState.resolverIntensity)  
-                elseif DeXState.resolverMethod == "Invert" then  
-                    predictedPosition = predictedPosition - (part.AssemblyLinearVelocity * DeXState.resolverIntensity * 2)  
-                end  
-            end  
-              
-            if DeXState.DesyncEnabled and DeXState.Desync then  
-                local desyncOffset = Vector3.new(  
-                    math.sin(tick() * 5) * DeXState.reverseResolveIntensity,  
-                    0,  
-                    math.cos(tick() * 5) * DeXState.reverseResolveIntensity  
-                )  
-                predictedPosition = predictedPosition + desyncOffset  
-            end  
-              
-            local currentCameraPosition = Camera.CFrame.Position  
-            local targetCFrame = CFrame.lookAt(currentCameraPosition, predictedPosition)  
-            Camera.CFrame = Camera.CFrame:Lerp(targetCFrame, 1 - DeXState.smoothingFactor)  
-        else  
-            DeXState.isLockedOn = false  
-            DeXState.targetPlayer = nil  
-        end  
-    end  
-end)
-
+	if not DeXState.masterToggle then
+		return;
+	end
+	if (DeXState.aimLockEnabled and DeXState.lockEnabled and DeXState.isLockedOn and DeXState.targetPlayer and DeXState.targetPlayer.Character) then
+		local partName = DeXState.bodyPartSelected;
+		local part = DeXState.targetPlayer.Character:FindFirstChild(partName);
+		if (part and (DeXState.targetPlayer.Character:FindFirstChildOfClass("Humanoid").Health > 0)) then
+			local predictedPosition = part.Position + (part.AssemblyLinearVelocity * DeXState.predictionFactor);
+			if DeXState.antiLockEnabled then
+				if (DeXState.resolverMethod == "Recalculate") then
+					predictedPosition = predictedPosition + (part.AssemblyLinearVelocity * DeXState.resolverIntensity);
+				elseif (DeXState.resolverMethod == "Randomize") then
+					predictedPosition = predictedPosition + Vector3.new(((math.random() * 2) - 1) * DeXState.resolverIntensity, ((math.random() * 2) - 1) * DeXState.resolverIntensity, ((math.random() * 2) - 1) * DeXState.resolverIntensity);
+				elseif (DeXState.resolverMethod == "Invert") then
+					predictedPosition = predictedPosition - (part.AssemblyLinearVelocity * DeXState.resolverIntensity * 2);
+				end
+			end
+			if (DeXState.DesyncEnabled and DeXState.Desync) then
+				local desyncOffset = Vector3.new(math.sin(tick() * 5) * DeXState.reverseResolveIntensity, 0, math.cos(tick() * 5) * DeXState.reverseResolveIntensity);
+				predictedPosition = predictedPosition + desyncOffset;
+			end
+			local currentCameraPosition = Camera.CFrame.Position;
+			local targetCFrame = CFrame.lookAt(currentCameraPosition, predictedPosition);
+			Camera.CFrame = Camera.CFrame:Lerp(targetCFrame, 1 - DeXState.smoothingFactor);
+		else
+			DeXState.isLockedOn = false;
+			DeXState.targetPlayer = nil;
+		end
+	end
+end);
 connections[#connections + 1] = RunService.RenderStepped:Connect(function()
-    if fovcircle.Visible then
-        local mouse = UserInputService:GetMouseLocation()
-        fovcircle.Position = Vector2.new(mouse.X, mouse.Y)
-    end
-end)
-
+	if fovcircle.Visible then
+		local mouse = UserInputService:GetMouseLocation();
+		fovcircle.Position = Vector2.new(mouse.X, mouse.Y);
+	end
+end);
 connections[#connections + 1] = RunService.Stepped:Connect(function()
-    handleMovement()
-    handleStrafe()
-end)
-
+	handleMovement();
+	handleStrafe();
+end);
 connections[#connections + 1] = RunService.RenderStepped:Connect(function()
-    updateESP()
-    updateChams()
-end)
-
+	updateESP();
+	updateChams();
+end);
 connections[#connections + 1] = Players.LocalPlayer.CharacterAdded:Connect(function(char)
-    if DeXState.SelfChamsEnabled then
-        task.wait(1)
-        applyChams(char, true)
-    end
-end)
-
+	if DeXState.SelfChamsEnabled then
+		task.wait(1);
+		applyChams(char, true);
+	end
+end);
 connections[#connections + 1] = Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function(char)
-        task.wait(1)
-        createESP(player)
-        if DeXState.OtherChamsEnabled then
-            applyChams(char, false)
-        end
-    end)
-
-    if player.Character then  
-        createESP(player)
-        if DeXState.OtherChamsEnabled then
-            applyChams(player.Character, false)
-        end
-    end
-end)
-
+	player.CharacterAdded:Connect(function(char)
+		task.wait(1);
+		createESP(player);
+		if DeXState.OtherChamsEnabled then
+			applyChams(char, false);
+		end
+	end);
+	if player.Character then
+		createESP(player);
+		if DeXState.OtherChamsEnabled then
+			applyChams(player.Character, false);
+		end
+	end
+end);
 connections[#connections + 1] = Players.PlayerRemoving:Connect(function(player)
-    if espObjects[player] then
-        if espObjects[player].box then espObjects[player].box:Remove() end
-        if espObjects[player].name then espObjects[player].name:Remove() end
-        if espObjects[player].healthBarOutline then espObjects[player].healthBarOutline:Remove() end
-        if espObjects[player].healthBar then espObjects[player].healthBar:Remove() end
-        if espObjects[player].tracer then espObjects[player].tracer:Remove() end
-        espObjects[player] = nil
-    end
-    
-    if player.Character and chamsObjects[player.Character] then
-        removeChams(player.Character)
-    end
-end)
-
+	if espObjects[player] then
+		if espObjects[player].box then
+			espObjects[player].box:Remove();
+		end
+		if espObjects[player].name then
+			espObjects[player].name:Remove();
+		end
+		if espObjects[player].healthBarOutline then
+			espObjects[player].healthBarOutline:Remove();
+		end
+		if espObjects[player].healthBar then
+			espObjects[player].healthBar:Remove();
+		end
+		if espObjects[player].tracer then
+			espObjects[player].tracer:Remove();
+		end
+		espObjects[player] = nil;
+	end
+	if (player.Character and chamsObjects[player.Character]) then
+		removeChams(player.Character);
+	end
+end);
 for _, player in pairs(Players:GetPlayers()) do
-    if player ~= Players.LocalPlayer then
-        if player.Character then
-            createESP(player)
-            if DeXState.OtherChamsEnabled then
-                applyChams(player.Character, false)
-            end
-        end
-    end
+	if (player ~= Players.LocalPlayer) then
+		if player.Character then
+			createESP(player);
+			if DeXState.OtherChamsEnabled then
+				applyChams(player.Character, false);
+			end
+		end
+	end
 end
-
-pcall(setupSilentAim)
-
-local UI = createUI()
-
-setupKeybinds()
-
-task.wait(0.5)
-
-print("==========================================")
-print("DeX DaHood UI - Version 0.0.1 Loaded!")
-print("==========================================")
-print("Features Included:")
-print("• Complete AimLock with Anti-Lock/Resolver")
-print("• Advanced Silent Aim with multiple methods")
-print("• Full ESP system with customizable options")
-print("• Self Chams with rainbow and color options")
-print("• Other Player Chams with wall visibility")
-print("• Advanced movement (Speed, Fly, NoClip, Strafe)")
-print("• Hit Sound system with multiple sounds")
-print("• Customizable keybinds for all features")
-print("• Nebula theme and lighting effects")
-print("• Adonis anti-cheat bypass")
-print("==========================================")
-print("Default Keybinds:")
-print("• Menu Toggle: " .. DeXState.menuKeybind.Name)
-print("• AimLock: " .. DeXState.aimLockKeybind.Name)
-print("• Fly: " .. DeXState.flyKeybind.Name)
-print("• Speed: " .. DeXState.speedKeybind.Name)
-print("• NoClip: " .. DeXState.noclipKeybind.Name)
-print("• Strafe: " .. DeXState.strafeKeybind.Name)
-print("==========================================")
-print("All keybinds can be changed in the Keybinds tab!")
-print("Enjoy the complete destroy experience <3!")
+pcall(setupSilentAim);
+local UI = createUI();
+setupKeybinds();
+task.wait(0.5);
+print("==========================================");
+print("DeX DaHood UI - Version 0.0.1 Loaded!");
+print("==========================================");
+print("Features Included:");
+print("• Complete AimLock with Anti-Lock/Resolver");
+print("• Advanced Silent Aim with multiple methods");
+print("• Full ESP system with customizable options");
+print("• Self Chams with rainbow and color options");
+print("• Other Player Chams with wall visibility");
+print("• Advanced movement (Speed, Fly, NoClip, Strafe)");
+print("• Hit Sound system with multiple sounds");
+print("• Customizable keybinds for all features");
+print("• Nebula theme and lighting effects");
+print("• Adonis anti-cheat bypass");
+print("==========================================");
+print("Default Keybinds:");
+print("• Menu Toggle: " .. DeXState.menuKeybind.Name);
+print("• AimLock: " .. DeXState.aimLockKeybind.Name);
+print("• Fly: " .. DeXState.flyKeybind.Name);
+print("• Speed: " .. DeXState.speedKeybind.Name);
+print("• NoClip: " .. DeXState.noclipKeybind.Name);
+print("• Strafe: " .. DeXState.strafeKeybind.Name);
+print("==========================================");
+print("All keybinds can be changed in the Keybinds tab!");
+print("Enjoy the complete destroy experience <3!");
