@@ -612,7 +612,6 @@ local function setWalkSpeed(speed)
     end
 end
 
-
 -- Improved fly system
 local flyBodyVelocity = nil
 local flyBodyGyro = nil
